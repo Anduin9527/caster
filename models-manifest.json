@@ -1,0 +1,66 @@
+[
+  {
+    "repo": "duongve/AnimaYume",
+    "revision": "e6d0f401dedb712a0a1b9620cd926ccf99c8ece3",
+    "filename": "split_files/diffusion_models/AnimaYume_v15_base.safetensors",
+    "size": 4182218328,
+    "sha256": "16354589c360b1690842c4c4d04046c35ad4de4516b15a06ac7aa350dc3265f2",
+    "url": "https://huggingface.co/duongve/AnimaYume/resolve/e6d0f401dedb712a0a1b9620cd926ccf99c8ece3/split_files/diffusion_models/AnimaYume_v15_base.safetensors"
+  },
+  {
+    "repo": "duongve/AnimaYume",
+    "revision": "e6d0f401dedb712a0a1b9620cd926ccf99c8ece3",
+    "filename": "split_files/text_encoders/qwen_3_06b_base.safetensors",
+    "size": 1192135096,
+    "sha256": "cd2a512003e2f9f3cd3c32a9c3573f820bb28c940f73c57b1ddaa983d9223eba",
+    "url": "https://huggingface.co/duongve/AnimaYume/resolve/e6d0f401dedb712a0a1b9620cd926ccf99c8ece3/split_files/text_encoders/qwen_3_06b_base.safetensors"
+  },
+  {
+    "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
+    "revision": "7d41107b653d3039be20972fb82398b01b3213eb",
+    "filename": "split_files/diffusion_models/qwen_image_edit_2511_bf16.safetensors",
+    "size": 40861031560,
+    "sha256": "ae42d927b5fac4f278b9a894554c727e619727a63622976f2d95625be4bce08c",
+    "url": "https://huggingface.co/Comfy-Org/Qwen-Image-Edit_ComfyUI/resolve/7d41107b653d3039be20972fb82398b01b3213eb/split_files/diffusion_models/qwen_image_edit_2511_bf16.safetensors"
+  },
+  {
+    "repo": "Comfy-Org/HunyuanVideo_1.5_repackaged",
+    "revision": "144e6ea259230936cdc6f140b3fe69c8529b5c47",
+    "filename": "split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors",
+    "size": 9384670680,
+    "sha256": "cb5636d852a0ea6a9075ab1bef496c0db7aef13c02350571e388aea959c5c0b4",
+    "url": "https://huggingface.co/Comfy-Org/HunyuanVideo_1.5_repackaged/resolve/144e6ea259230936cdc6f140b3fe69c8529b5c47/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors"
+  },
+  {
+    "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+    "revision": "7beb7b647f04469fbe64ba8adc2bb0d7e5e9f73f",
+    "filename": "split_files/vae/qwen_image_vae.safetensors",
+    "size": 253806246,
+    "sha256": "a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f",
+    "url": "https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/7beb7b647f04469fbe64ba8adc2bb0d7e5e9f73f/split_files/vae/qwen_image_vae.safetensors"
+  },
+  {
+    "repo": "lilylilith/AnyPose",
+    "revision": "27c4b1f7688940d39767e652fe8d87faf44a0881",
+    "filename": "2511-AnyPose-base-000006250.safetensors",
+    "size": 295146208,
+    "sha256": "0396314e43b94f7520cf5242e6aa6e8e9095d784f7e87ee45980c2e541ee8c4d",
+    "url": "https://huggingface.co/lilylilith/AnyPose/resolve/27c4b1f7688940d39767e652fe8d87faf44a0881/2511-AnyPose-base-000006250.safetensors"
+  },
+  {
+    "repo": "lilylilith/AnyPose",
+    "revision": "27c4b1f7688940d39767e652fe8d87faf44a0881",
+    "filename": "2511-AnyPose-helper-00006000.safetensors",
+    "size": 295146216,
+    "sha256": "674340c62fff3cf981d0cfc55daf2f0e6f51c56b50159e241d931748200cf1eb",
+    "url": "https://huggingface.co/lilylilith/AnyPose/resolve/27c4b1f7688940d39767e652fe8d87faf44a0881/2511-AnyPose-helper-00006000.safetensors"
+  },
+  {
+    "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning",
+    "revision": "d74eba145674fd7e31b949324e148e21e7118abd",
+    "filename": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+    "size": 849608296,
+    "sha256": "22226e8d05d354bb356627d428809f5afd7819399b077238a2b70a82883a904f",
+    "url": "https://huggingface.co/lightx2v/Qwen-Image-Edit-2511-Lightning/resolve/d74eba145674fd7e31b949324e148e21e7118abd/Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors"
+  }
+]

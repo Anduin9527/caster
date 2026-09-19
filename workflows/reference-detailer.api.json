@@ -1,0 +1,130 @@
+{
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "qwen_image_edit_2511_bf16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "type": "qwen_image",
+      "device": "default"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "qwen_image_vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "lora_name": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+      "strength_model": 1.0
+    }
+  },
+  "5": {
+    "class_type": "ModelSamplingAuraFlow",
+    "inputs": {
+      "model": [
+        "4",
+        0
+      ],
+      "shift": 3.0
+    }
+  },
+  "6": {
+    "class_type": "CFGNorm",
+    "inputs": {
+      "model": [
+        "5",
+        0
+      ],
+      "strength": 1.0
+    }
+  },
+  "7": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "reference-validation.png"
+    }
+  },
+  "12": {
+    "class_type": "UltralyticsDetectorProvider",
+    "inputs": {
+      "model_name": "bbox/face_yolov8m.pt"
+    }
+  },
+  "13": {
+    "class_type": "VNCCS_QWEN_Detailer",
+    "inputs": {
+      "threshold": 0.5,
+      "dilation": 0,
+      "drop_size": 10,
+      "feather": 0,
+      "steps": 4,
+      "cfg": 1,
+      "seed": 9751,
+      "denoise": 1,
+      "tiled_vae_decode": false,
+      "tile_size": 512,
+      "sam_detection_hint": "center-1",
+      "sam_dilation": 0,
+      "sam_threshold": 0.93,
+      "sam_bbox_expansion": 0,
+      "sam_mask_hint_threshold": 0.7,
+      "sam_mask_hint_use_negative": "False",
+      "target_size": 1024,
+      "instruction": "Describe the key features of the input image (color, shape, size, texture, objects, background), then explain how the user's text instruction should alter or modify the image. Generate a new image that meets the user's requirements while maintaining consistency with the original input where appropriate.",
+      "inpaint_mode": false,
+      "inpaint_prompt": "[!!!IMPORTANT!!!] Inpaint mode: draw only inside black box.",
+      "color_match_method": "kornia_reinhard",
+      "seam_fix": true,
+      "qwen_2511": true,
+      "distortion_fix": true,
+      "image": [
+        "7",
+        0
+      ],
+      "bbox_detector": [
+        "12",
+        0
+      ],
+      "model": [
+        "6",
+        0
+      ],
+      "clip": [
+        "2",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "prompt": "Change emotion to happy",
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "upscale_method": "nearest-exact",
+      "crop_method": "disabled"
+    }
+  },
+  "14": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "13",
+        0
+      ],
+      "filename_prefix": "aigc/reference-detailer"
+    }
+  }
+}

@@ -1,0 +1,511 @@
+{
+  "schema_version": 1,
+  "title": "VNCCS Pose Library",
+  "repo_id": "MIUProject/VNCCS_PoseLibrary_Main",
+  "updated_at": "2026-05-23T22:32:53.471063+00:00",
+  "poses": [
+    {
+      "name": "Fighting A",
+      "category": "Fighting",
+      "tags": [
+        "Fighting",
+        "standing",
+        "full body"
+      ],
+      "json_path": "poses/Fighting/Fighting A.json",
+      "preview_path": "previews/Fighting/Fighting A.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "cc507915997cd894d58ca08097bcb7bc7364522cd4a9cf73246828de59cd6b9b",
+      "preview_sha256": "dc505c10336fa504a4a9941e2cc15366ff6c2c34dbc02325fa0d21fb654f6c4f",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 101,
+      "display_name": "格斗戒备",
+      "render_sha256": "067875c3ad5ff7fe10faacfab8c715a6af06fab83b69ce1d0dad8b13d92e1997",
+      "native_renders": {
+        "1024x1536": "cb7cf21d1ef4938df4baf771db5a31afc9cc297a0a59e13a69e8d09374a3dcc8",
+        "768x1152": "9ee871800e318acd1a4a1164280073dc052d04cd044d1546215fe8da0ab718ca",
+        "768x1024": "b403be28ce25b86f434f7c28a3186f261dd9fc79a316013843f88fe3464f4c3f",
+        "1152x1536": "f9fd36369e098f8f4161d9d2789d6f6880ae0b4a0b450aac3190fc5d551dca98",
+        "1024x1024": "1d24d46f6c45b22f98fd22745b072afe1dec104b9f1b5fd24a820d3eaddb69ac",
+        "864x1536": "7bec30d495b6db1594ab6eb6265c1cd45cb167bf128e1e2bdd5fd9f22a04a32e",
+        "1536x864": "a7dc8c2b4ad39369ba9b038a17b2eec3816e0c042db42b65577ff882e425cc45"
+      }
+    },
+    {
+      "name": "Fighting B",
+      "category": "Fighting",
+      "tags": [
+        "Fighting",
+        "standing",
+        "full body"
+      ],
+      "json_path": "poses/Fighting/Fighting B.json",
+      "preview_path": "previews/Fighting/Fighting B.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "e3729f29f1270247e0d8bb978101cc42ec8fe161646c578ae4708a417e091099",
+      "preview_sha256": "1205adb78d6f03fd0062c9a1a54e1dd08ab6f747a8032461e0511028d5804396",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 102,
+      "display_name": "抱臂防守",
+      "render_sha256": "1cbad3341070acc7f811822cdbdcd068d3dd849da9947e5378aaececbe2ba2cf",
+      "native_renders": {
+        "1024x1536": "ce2200053eb7c946d7d53c7c780889cb32d72e1e538da9ae45537c17cb0b95cd",
+        "768x1152": "fbe281457cdf80c550be60a295119dd3ca4caa4d7ce74fb79c13d378dd642ed2",
+        "768x1024": "7417d2553ca9e35215f3cce2d108bec00116bbfeeda2d4640967bae29f693da7",
+        "1152x1536": "ae167fb93d298f3b8130451eb022617cac7bf6ce948ec50a2cf21090be21bd35",
+        "1024x1024": "151e8b537ce97fd4f52905b166d15b8490304d437b4ed8983551aaa70e69f070",
+        "864x1536": "1133b72428f05b0890e9b83912705807003156d7cd6327682377b7098f260bda",
+        "1536x864": "66c959026aa9f5a6df516987606bef89ad7ec37d2f2a396aa51926a4869b1bca"
+      }
+    },
+    {
+      "name": "Fighting C",
+      "category": "Fighting",
+      "tags": [
+        "Fighting",
+        "standing",
+        "full body"
+      ],
+      "json_path": "poses/Fighting/Fighting C.json",
+      "preview_path": "previews/Fighting/Fighting C.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "62deb7bcb55718e8c8dd8f20679a501e458bd4fa289379f44a5777bdb5ae1055",
+      "preview_sha256": "33a83bed81dea7adbc0079bfeb6cb837754c8d4292efbc1a80f9b705b000db5c",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 103,
+      "display_name": "侧踢",
+      "render_sha256": "6b38f172e868b2998cc5983a68f6c73e9e5ec5ebb38b52d3629a4bb6168b38e6",
+      "native_renders": {
+        "1024x1536": "c48459401c88d7c8e753bd408d6ce6ad74b63e194b175aef9ee9a83d0cca88d2",
+        "768x1152": "ab79116e718265a1cf1a1559c53f6cd7566034af8fdd624dc651c63ff1b75990",
+        "768x1024": "39e7661a1a9585c8f03636b7da09dd08b2cab6f291674759d5641513a51061ca",
+        "1152x1536": "3b286b054bf17d2468b11b1d9145ac027a9303836d80e948733634e8f0bc6e94",
+        "1024x1024": "211010e0bfca63f8b66dc4796d479cacb232303f6de3788a21bf9f43f1ba7664",
+        "864x1536": "32f23df9f6da1c820243e24132157982b904e2ca380091fa53f17f2548605a1c",
+        "1536x864": "3dd8c00d3865d7321a61b0b6be4baf339cde294bd488d1f12f539f4099c6f791"
+      }
+    },
+    {
+      "name": "Fighting D",
+      "category": "Fighting",
+      "tags": [
+        "Fighting",
+        "standing",
+        "full body"
+      ],
+      "json_path": "poses/Fighting/Fighting D.json",
+      "preview_path": "previews/Fighting/Fighting D.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "685bd14332018d82fade8779afe4f2a4f4dddfa2b71fb02b4a34d6128cf60be4",
+      "preview_sha256": "e32e870b5a5059a98221ec1c1ac382e0ff3e6cf999725952d435dcc428106f8a",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 104,
+      "display_name": "抬膝格斗",
+      "render_sha256": "0baf292a49175c10dc977ff3b0d34246c0ad5830a5a66ad8a981d9ce6fea9905",
+      "native_renders": {
+        "1024x1536": "cf0c8846ab50a81dfa95b827be3b6836152cead8b19beb99a2e3bafcbf765261",
+        "768x1152": "22ae6626adbe7d8053742e3f74e67f40352bfb97665a1c420b2938375eb369b5",
+        "768x1024": "2bf9730e62775eb71a036bd78f0e44a69c1c96c8096d2009bbf41d7fc7e5e590",
+        "1152x1536": "aa1a5872a408ada55cd7bfa78b33a84cc9c3ab24f7f330634e50cf99faf7c9b7",
+        "1024x1024": "ee41f0bed16419024419e14fa80a1521655c6b4dc7beac95d1fb4c748ba789ad",
+        "864x1536": "e3988bf471092143d6d6a3fbdcbda558d80b008bb9d9291ed3c1bf3e9fd7b10b",
+        "1536x864": "7e820f4a3f43f19fbaefcd1e79f2851b6d9c639e77fd35d2cb22d931622055d8"
+      }
+    },
+    {
+      "name": "CloseUp  B",
+      "category": "Rest",
+      "tags": [
+        "closeup",
+        "rest",
+        "standing"
+      ],
+      "json_path": "poses/Rest/CloseUp  B.json",
+      "preview_path": "previews/Rest/CloseUp  B.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "6134653701def9451c3288702a94087b9915d4145a5918db38613984f50df6ed",
+      "preview_sha256": "417a5556e41b78d7557760156863a13e30f078d6cf0ea4bdc574eba4d93f1281",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 105,
+      "display_name": "双手比耶",
+      "render_sha256": "2cdeb50cf34e555457f315ea67c13a8e893d49d930225eb47abeeb6b2531c830",
+      "native_renders": {
+        "1024x1536": "c75048366cd35153211b439898c2803c3abd200ba07655f87de3668d894a2b58",
+        "768x1152": "ad5ce329b1ef4606d0124110248bc153e387e218d0f11067d3b52ebe465dfa6c",
+        "768x1024": "29336be67bb0dfa46e532fad041fb125145fb633089512bba79d403b1eb2efc3",
+        "1152x1536": "34d8d60230c165a4c0301614d69649964c2f8c0371b62fdb816876a309006680",
+        "1024x1024": "5245eae4553be60e347b5bac0122d8827bb8e1a6466b442b34ee84a1d7de7660",
+        "864x1536": "a01b13c36a0741294ee88bd23bf8ff56b813a5a9378f41b43c61c9e06039c7d8",
+        "1536x864": "8949dd70f912107a1143523c29b9e71a61de8136ca3a432a4499f65cb7888492"
+      }
+    },
+    {
+      "name": "CloseUp  C",
+      "category": "Rest",
+      "tags": [
+        "closeup",
+        "rest",
+        "standing"
+      ],
+      "json_path": "poses/Rest/CloseUp  C.json",
+      "preview_path": "previews/Rest/CloseUp  C.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "0b363f9b5a3d9a301108af3c3bf5a995bec0cb31321a651037f48a4658e6efb5",
+      "preview_sha256": "ec2fb5ff61ab2ec045bb109960990d6b8674d4cd9401d6d0b2e1d29300d38c93",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 106,
+      "display_name": "单手敬礼",
+      "render_sha256": "8949114c31b860bf46a1568542aa47d080ddc60272c162bbdba063f9ebdaeca5",
+      "native_renders": {
+        "1024x1536": "689d9fe23bb8a7370bb3a1b143183f110629980c75276b2e9279ea45fc652132",
+        "768x1152": "bbae5f09f8b37d24830032c92791b60a08ce8be54a6003ec7096f76d87c84fbd",
+        "768x1024": "bda256237ffe707d90e9ff7c30ff850b129d888ba7b0ea2c0eba7f28c1321a41",
+        "1152x1536": "80f8a71285919324c83a7587c63c9910048db2bd9093d7afa77a17613598d2ca",
+        "1024x1024": "a6713e00817114d2dd768452f2bc186e0d6a215cf86a504b9342f30fa981ad89",
+        "864x1536": "2418aebfc9e051e0eb5edf6c72999ff1fbb5b398740fc65d474499364ac80215",
+        "1536x864": "5085a569e5addfb578bd55f79588f5006e07433248d3450b59ad4ee4ed7ceeb6"
+      }
+    },
+    {
+      "name": "CloseUp  D",
+      "category": "Rest",
+      "tags": [
+        "closeup",
+        "rest",
+        "standing"
+      ],
+      "json_path": "poses/Rest/CloseUp  D.json",
+      "preview_path": "previews/Rest/CloseUp  D.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "f16163dd486a69075e1f30167a2dd5941bd3a3b5581aea887934a89da70c5004",
+      "preview_sha256": "d037832f98580ac2ef41efdf2af9d16a28129d373c3afbdd19b7b70ac1734c15",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 107,
+      "display_name": "双手举至脸侧",
+      "render_sha256": "de44914029b0e9441bbcdcf844fa8ba63027ff954f759fa52a1bed8f1fde4219",
+      "native_renders": {
+        "1024x1536": "dc2c3af189a73a310c66df51a9eb231efd3aa47c0e092315dd47a783903091ac",
+        "768x1152": "023971646a884a0a6596abf17e304f81894aa1443afa3c37ef2a2eb0515b330e",
+        "768x1024": "9c921b2584f71cbb0f7c29660711cf6cc4767bb93c63f9dfb2183c40dc69402f",
+        "1152x1536": "671f7af3e4301230a3ad6743f3bc2f0e8359b591ba7a6e1a4ee4af13ae093244",
+        "1024x1024": "98e339bae4250e56a5d29e9817832c0f9fbbbc27b677f417da6da74baa972f46",
+        "864x1536": "2e2745563c70936374175b3ae5585f50e8c184bdfcfaef989e8d8a957c85fa1e",
+        "1536x864": "ef59ab1af42c8a943399f0e8037e59cca6a997cf42953166220aad1f75ba295d"
+      }
+    },
+    {
+      "name": "CloseUp A",
+      "category": "Rest",
+      "tags": [
+        "closeup",
+        "rest",
+        "standing"
+      ],
+      "json_path": "poses/Rest/CloseUp A.json",
+      "preview_path": "previews/Rest/CloseUp A.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "6bd6046842e768e8bed6334d52a24dc0c1b7081cab528df7c5663c8182974f9e",
+      "preview_sha256": "284af155e81f975b8a0c695b4995f45cc042c1ba582bd1ea4afdae048dbf0a19",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 108,
+      "display_name": "敬礼叉腰",
+      "render_sha256": "15d3ca4542a9a79a956d71ea926e40949cab265fc9e9513605a590c34e956972",
+      "native_renders": {
+        "1024x1536": "fb12bcbf7156f352851c0dd23fa069b331bfb116daa92085b8969bef279ff325",
+        "768x1152": "bee2d5bb3f19097a1e7ccbf9821f2628b2892482534747c4896987ec6e18c2b4",
+        "768x1024": "f4a42e8dddca94c97646bdab2bbbfa8c6989b6cc34b16e8c95fed09d4c7e00ee",
+        "1152x1536": "1d84c9e0d003deb97f068fe5d81c969ccd1899b70140ff03091d3e5beed1fd73",
+        "1024x1024": "3af43b551c5620d176cbe0f28c55bb3981e7f6c245f25dccea7fc887c700da0f",
+        "864x1536": "1f97dd22abfa2293e33826fa9cc8043ca0dc610241d9829daf4e742048ce42ed",
+        "1536x864": "6f2bc1a29fce6363f184e78edfa2a1a9017915eba0e2d4bf54d667f68a227e01"
+      }
+    },
+    {
+      "name": "Lying A",
+      "category": "Rest",
+      "tags": [
+        "calm",
+        "lying",
+        "rest"
+      ],
+      "json_path": "poses/Rest/Lying A.json",
+      "preview_path": "previews/Rest/Lying A.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "ea322aead4809b243b4567b54dcff5366c6a644bcee7430d8cc85d0421a5caa8",
+      "preview_sha256": "5f1404a1867b7793ce2168df2aa9f476d855090e212cf6757066371cc6704e60",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 109,
+      "display_name": "仰躺屈膝",
+      "render_sha256": "2656a2895d61a7f2f6f9fd3dd559cb939a43680e0f9599919103ff6517508da5",
+      "native_renders": {
+        "1024x1536": "cfbac63ac242057cdcb0475949c2d43d8e3962af511ec9158cfbbb767929a0cf",
+        "768x1152": "d54c5b0b9c5c2f4df407a54ceaf339601272fb6ece1ff593806fd8a2c3f9ed03",
+        "768x1024": "4791692f57651afe569c520d940d3c5257d9d7041afad497ff9cbf9f1d15ebd1",
+        "1152x1536": "18a6e195ccf8742389fa6f415c5f4eec20939caebd6ba56cf13c972ef6502b90",
+        "1024x1024": "9c3e87b274570e3cf4e92008e18a19b9d2309992cbd5e3f190a977aab37fc12e",
+        "864x1536": "1c938eaf60bcb8d59958f6602229c77cce3ab9170c87b44a8061140da07363b9",
+        "1536x864": "f822eef3fcb5199c18feaeb98afa102eb761f16135141204a8643df3f8550a3f"
+      }
+    },
+    {
+      "name": "Lying B",
+      "category": "Rest",
+      "tags": [
+        "calm",
+        "lying",
+        "rest"
+      ],
+      "json_path": "poses/Rest/Lying B.json",
+      "preview_path": "previews/Rest/Lying B.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "c66dccf32e56e390b269297aee8fa885adae863ac1d557ac4a3437d85d07a663",
+      "preview_sha256": "8d32763cd13a14484b128fad878de5d54a2007cba274a4ab7b2bc61db4dfa8f0",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 110,
+      "display_name": "抱膝倚靠",
+      "render_sha256": "dec1cba16e865e56503d30883b7ef421a8528104e772f36f3c9e6749d90606de",
+      "native_renders": {
+        "1024x1536": "2484edfffdfa8265ecd098a511ee8701cafd9ba3a81ca1a79c0d39d6fab254e0",
+        "768x1152": "0652bdcc496ba138ac53f4c1e8ae750e6cea95fd21d8bdc2240190bac6339b8f",
+        "768x1024": "59e6c2b6b561308379251ad099ce2d8d96ecba4c158434e8ff9bbd23bd1991dc",
+        "1152x1536": "84a99b2e913957021f88e0e07ff3e6a2dcb623f65d276c205d634524374aa2c7",
+        "1024x1024": "eb89eaafbb2bf4d339fabb8725dc487d8571e6ddf6d4b7bd28c0822211767fc1",
+        "864x1536": "0c777a4be5ea1c2ed605691704e8a51ab4ca6620cef5601e6e72ec3e8c454a5b",
+        "1536x864": "5b3db96ef7511f9241651bebbfe2c0c223adbe5f6a9872bee80edf207a5f0554"
+      }
+    },
+    {
+      "name": "Lying C",
+      "category": "Rest",
+      "tags": [
+        "calm",
+        "lying",
+        "rest"
+      ],
+      "json_path": "poses/Rest/Lying C.json",
+      "preview_path": "previews/Rest/Lying C.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "47c8ffcf267b8cf0c61f4737d1a660917810188b74d80f0f1260f35a8bb8b5fa",
+      "preview_sha256": "f69e193125b9b734e2e837b811b3ef3b002f1275954af1b9e117d17b39fa33c7",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 111,
+      "display_name": "侧卧屈膝",
+      "render_sha256": "7838acd2fcff6a6225db891401aa83720ba8daac82e9d5fa09ae2d315139aff6",
+      "native_renders": {
+        "1024x1536": "2aef9e6856d2ad21f64b413f6892f662684f033f1fcb74092c771ad9cdabc353",
+        "768x1152": "b3d98219590c78aa47214b5730be4babfbbfb773ee6b591d7c24e80ce3e4939c",
+        "768x1024": "619526cb78773cfead74a749d20cc9a0ec8eafbe521dbc4cd2fbf5657b0fdf36",
+        "1152x1536": "aa7c43f2ec05a702d2489f7f470ab2487910ae4b48ce9a583096f2eabd9933e1",
+        "1024x1024": "335673b551fd71bf7bc6f0dd6fd3fc03b7be161bbcd819d4e44fedf761cf73ca",
+        "864x1536": "27d274aa0bcf86204f0cf601b82821cdaa1c55d0a6f9060e16caada91bc3721d",
+        "1536x864": "e14ee0a592c712d3fe4d520880ec816a40edecc6f84f35258392eb6f95ed95b7"
+      }
+    },
+    {
+      "name": "Lying D",
+      "category": "Rest",
+      "tags": [
+        "calm",
+        "lying",
+        "rest"
+      ],
+      "json_path": "poses/Rest/Lying D.json",
+      "preview_path": "previews/Rest/Lying D.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "117dae735d64f06ff5394ad8a9ab4b3d4bcbff4e511c735a7b3402a6c1f4bb09",
+      "preview_sha256": "e72f146f826e970ffed6399ec61f8d853ee109e374a779377c34c7c9e5fefaa3",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 112,
+      "display_name": "侧卧伸展",
+      "render_sha256": "52df488ae709f4220f40e9095021a073ef8c7e28bdaef64808203772e533fce6",
+      "native_renders": {
+        "1024x1536": "679def72778b90231a61ab8a6bdd90b2670c14a0c29eec6cab2af4435e1f9689",
+        "768x1152": "2152746fa607a35554faeace89959d1f451afabb639b186197d898f433e1fdba",
+        "768x1024": "fa29fdca23fb0d1fe6498679b926b5b0580aae6158e6b00820c7ca6f3b1a7d8f",
+        "1152x1536": "4a0687a5047bdb092eb19fbf1e4abc51300e0801421965c8f18c7f1ec1aa2109",
+        "1024x1024": "3861918ba4f94c7ed69170b066a95d62b356d0ef6077d9eb9da7917ca951fb2e",
+        "864x1536": "ef96648711faa94a1ae3f9bd54c53ac636292c233bdd5f76e9cd820444ea2668",
+        "1536x864": "3041eda0d0b64d20e03c2742e943972ec1c48e6fa4a2f6f9eba44d0350df3df5"
+      }
+    },
+    {
+      "name": "Standing A",
+      "category": "Standing",
+      "tags": [
+        "standing",
+        "rest",
+        "relaxed",
+        "posing"
+      ],
+      "json_path": "poses/Standing/Standing A.json",
+      "preview_path": "previews/Standing/Standing A.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "452263e6203f9489a89969bbca4f848bf6dfc0650489c405fcc45777ed9732dd",
+      "preview_sha256": "819d338d24c9f15fe35f49d895718ec152f132ca3b11ffac4d59a8c5fbcbcbc2",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 113,
+      "display_name": "单手叉腰",
+      "render_sha256": "8ecb0db771da29e7ba5c00bdb20054715074320022decda6db111c9bda545d8d",
+      "native_renders": {
+        "1024x1536": "19884ae45e9aa5f2ac430e3cbb92012b03c928c4c83748e11b00804d15d8a6c8",
+        "768x1152": "ff995d514fac57e4db828cc16d4bb06fad7989d124fb37cde6a9bda7534f35bd",
+        "768x1024": "312d87f48394897892355837bda80f79adb88960b447ce3e6e0f4f05c6ff8af9",
+        "1152x1536": "caf1eddeedb13fc35b5f0160c0877e446651c7e8d579d69662454a71d4b4aefc",
+        "1024x1024": "a9c3f7dae237341f6377a6ac2f7fd8b7b4f1fd6243aee3f0e992d8f28b1e13da",
+        "864x1536": "01bf1fd72d6bc856eeaf1c6b488b28f48be74724eb390e864df62ee4d8096db7",
+        "1536x864": "b3f99b111959faf3c3ccd0425a942e0630c55417d96d7179f65a36f4b92ee042"
+      }
+    },
+    {
+      "name": "Standing B",
+      "category": "Standing",
+      "tags": [
+        "standing",
+        "rest",
+        "relaxed",
+        "posing"
+      ],
+      "json_path": "poses/Standing/Standing B.json",
+      "preview_path": "previews/Standing/Standing B.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "d053d7cd9433eae173648191cedf00f6747d4b783d1ac3b73a97e0c10224bc3b",
+      "preview_sha256": "ec1970a7de0122e1ffe80ad25511fb5467e243e3d933c81161124c3a9051d85c",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 114,
+      "display_name": "自然站立",
+      "render_sha256": "b156456312f8dffbd21704e6a5e81bbace86dd0e7e0b25b359e0a1c8cd19e9ad",
+      "native_renders": {
+        "1024x1536": "b8c7c4e907511735ca0bf3d8b56c9b85b5f285b09858913da212c944db328849",
+        "768x1152": "6fe940da9bd252ddac78eba81547584fd45213b08fb6f81beed6d8df5803d6d7",
+        "768x1024": "fa6ab0b76385e8b7c4ac21b596f7209ec20ea622bf611a3f536570eaba20c843",
+        "1152x1536": "9d0f8f50d15cdd3c61dd9e2ef7a66178cb2618d85e108f30ef11795d11cfee5c",
+        "1024x1024": "2fc8cae3a187335678a6052fa44de37bd788f3237af06bf476feacd6c186e88f",
+        "864x1536": "b13cd41152a8cc85c9864bd4d89a481470cf0b5d49e0784807cc74362408f6ac",
+        "1536x864": "7fed0f84710c2a6a00fa0c5130309c0096c1fc36584c6c1215ddb05af659aa8f"
+      }
+    },
+    {
+      "name": "Standing C",
+      "category": "Standing",
+      "tags": [
+        "standing",
+        "rest",
+        "relaxed",
+        "posing"
+      ],
+      "json_path": "poses/Standing/Standing C.json",
+      "preview_path": "previews/Standing/Standing C.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "3954ed502e0d1f7adb6a8d9991648afc05cb8337ca15490d46f7b0d601542d26",
+      "preview_sha256": "1e6404e8fd20a7de60c4d762f847113e7b1d6525dc79ccfeff17b76c13267a34",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 115,
+      "display_name": "抬手示意",
+      "render_sha256": "c6326bc4c8e306e2774af0b817d869c4bccc1e4d13f8faf2fbe42d637b0cfbcc",
+      "native_renders": {
+        "1024x1536": "2a7198fd3a916ef55f95787453c7cdde3509c9650229f27835a39851b64a4d53",
+        "768x1152": "ac7cca5b6b221616cd12ae5105b48281318368ccbdd6e3766f070dbf9d6bbccc",
+        "768x1024": "0cf843b755bf1dceb46452b691150d26b70562348ac9a1b716a516968bd14d82",
+        "1152x1536": "329b72f3116522a63803ad3aa25472dd6c4ff989077430a816083797e7c5ddba",
+        "1024x1024": "a1d722ab81d6cf52b6292064e55c5621a56affe8b94afeac6d0e7678065d0b4d",
+        "864x1536": "7cab9823eee0bac4a82c1888711bacbbbe3e10d8f62a9c8541ed3dd8c0df181a",
+        "1536x864": "625351bc47f0d2ddbe9091e029d3bb5f2b9c20f01971707b79212c321a3cabd5"
+      }
+    },
+    {
+      "name": "Standing D",
+      "category": "Standing",
+      "tags": [
+        "standing",
+        "rest",
+        "relaxed",
+        "posing"
+      ],
+      "json_path": "poses/Standing/Standing D.json",
+      "preview_path": "previews/Standing/Standing D.webp",
+      "preview_type": "image/webp",
+      "json_sha256": "c2eb81d7ef6ba37c629f22c2aef22a030bc18cfc67e8ce6353af33442795b437",
+      "preview_sha256": "f49b87f66bc13a88879250bf23f38c393ef44dd3379f4cb5616c4568364e026e",
+      "updated_at": "2026-05-23T22:32:53.471063+00:00",
+      "id": 116,
+      "display_name": "双手背后",
+      "render_sha256": "cbec1eab4ddd1d1b10f983d89cb1137d20396517445226118be97948d9ab9af5",
+      "native_renders": {
+        "1024x1536": "3dbbb9b74ded0a24107ec6835cafff5124ec50cd8f1838db2440207c7ddcf43f",
+        "768x1152": "b00f59efe190bcd121cfa594528b460e9f1fa643f073286a64155751a5c97682",
+        "768x1024": "ee99e02ff0666e0fca5ec715670c921fd111babf20f81f891713cd04ce93946c",
+        "1152x1536": "1dae56bd02d3460a0b087789bcba59b2d171a6936d8e167cd8cf9229d3dfb01b",
+        "1024x1024": "9f4f799a5fac631f58d6a5aef598ae7abe29c1379d1c86d309fc24f6366f1a5f",
+        "864x1536": "cc11cbca748bc3d40774c1286f8e5c1dc81b39866444ea167b090492f2756942",
+        "1536x864": "ebd526b06031fb7dbd96cd0ea0e03ff7588917388fa28d57befbe05c4abf0c06"
+      }
+    }
+  ],
+  "revision": "baef0455ef9d3cc31ce3e2a407f722069355c617",
+  "source": "https://huggingface.co/MIUProject/VNCCS_PoseLibrary_Main",
+  "renderer": {
+    "source_revision": "70b752f2f1ac7a6aa22aa9418f730195c3cef58b",
+    "core_sha256": "4abc5ced7eb946cfad8c8b7de335850e726d5833a361b30cf9b8b518d1943f81",
+    "harness_sha256": "19421b52f3f50689c2d27148bb6a8b2fe719a7fc0d21a0f58c80664473c7c5ba",
+    "width": 1024,
+    "height": 1024,
+    "background": "white",
+    "camera": "front, fitted to posed skinned vertices",
+    "body": "MakeHuman neutral, texture disabled"
+  },
+  "native_render_policy": {
+    "framing": "Fit posed skinned geometry to native aspect, 8% margin, no padding",
+    "sizes": [
+      {
+        "id": "1024x1536",
+        "width": 1024,
+        "height": 1536,
+        "ratio": "2:3",
+        "label": "竖版 2:3 · 1024×1536（默认）"
+      },
+      {
+        "id": "768x1152",
+        "width": 768,
+        "height": 1152,
+        "ratio": "2:3",
+        "label": "竖版 2:3 · 768×1152（较快）"
+      },
+      {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "ratio": "3:4",
+        "label": "竖版 3:4 · 768×1024（较快）"
+      },
+      {
+        "id": "1152x1536",
+        "width": 1152,
+        "height": 1536,
+        "ratio": "3:4",
+        "label": "竖版 3:4 · 1152×1536"
+      },
+      {
+        "id": "1024x1024",
+        "width": 1024,
+        "height": 1024,
+        "ratio": "1:1",
+        "label": "方形 1:1 · 1024×1024"
+      },
+      {
+        "id": "864x1536",
+        "width": 864,
+        "height": 1536,
+        "ratio": "9:16",
+        "label": "长竖版 9:16 · 864×1536"
+      },
+      {
+        "id": "1536x864",
+        "width": 1536,
+        "height": 864,
+        "ratio": "16:9",
+        "label": "横版 16:9 · 1536×864"
+      }
+    ],
+    "renderer_script": "scripts/pose-studio-render.html"
+  }
+}

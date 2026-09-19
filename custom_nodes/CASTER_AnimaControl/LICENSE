@@ -1,0 +1,21 @@
+Anima Control — Pose (Preview-1)
+Non-Commercial License (inherited)
+
+These adapter weights (adapter_model.safetensors) are a derivative of the Anima
+base model (circlestone-labs/Anima), which is itself a derivative of
+nvidia/Cosmos-Predict2-2B-Text2Image.
+
+As a derivative, these weights inherit and are bound by the upstream terms:
+
+  1. CircleStone Labs Non-Commercial License
+     https://huggingface.co/circlestone-labs/Anima  (see its LICENSE.md)
+  2. NVIDIA Open Model License Agreement (insofar as it applies to Derivative Models)
+     https://www.nvidia.com/en-us/agreements/enterprise-software/nvidia-open-model-license/
+
+The MODEL WEIGHTS are for NON-COMMERCIAL use only.
+
+Generated images (Outputs) are NOT restricted by these terms and may be used
+commercially, consistent with the base model's license.
+
+This file is a pointer to the governing upstream terms, not an independent grant
+of rights. If an upstream license forbids a use, that prohibition applies here.

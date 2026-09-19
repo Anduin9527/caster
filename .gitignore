@@ -1,0 +1,90 @@
+.venv/
+config.env
+.env
+.env.*
+!.env.example
+data/
+*.sqlite3
+*.sqlite3-*
+*.log
+service.json
+service.lock
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+archive/
+samples/
+reference-validation/
+tests-result.txt
+*.result.json
+*.submission.json
+/*.png
+
+# Internal/handoff documents (not for open source)
+/docs/HANDOFF.md
+/docs/CODEX_START.md
+/CLEANUP_CHECKLIST.md
+
+# Test artifacts and acceptance records
+/expression-acceptance.json
+/acceptance-manifest.json
+/face-selection-acceptance.json
+/source-checksums.json
+/visual-review.json
+/pixel-invariance.json
+/restart-recovery.json
+/workflows/*.result.json
+/workflows/*.submission.json
+/workflows/*.probe.json
+/workflows/*.metrics.json
+/frontend/node_modules/
+/frontend/dist/
+/frontend/public/demo-assets/
+/frontend/qa/
+!/frontend/src/data/
+!/frontend/src/data/poses.json
+
+# Server-only operational files
+/backups/
+/logs/
+
+# Local caches and credentials
+*.safetensors
+*.onnx
+*.pt
+*.pth
+*.pem
+*.key
+/frontend/.vite/
+
+# Sensitive configuration
+*.local.json
+
+# Local development history, experiments and review evidence
+/ACCEPTANCE.md
+/POSE_AUTOMATION_DESIGN.md
+/REFERENCE_WORKFLOWS.md
+/docs/*_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].md
+/docs/research/
+/docs/MIGRATION.md
+/docs/migration-integrity.json
+/frontend/design-qa.md
+
+# Saved editor sessions (not reusable workflow definitions)
+/workflows/*.saved.workflow.json
+/workflows/pose-third.workflow.json
+
+# Local agent maintenance instructions
+/AGENTS.md
+/frontend/AGENTS.md
+
+# Machine-specific deployment tools (local only)
+/deployment/
+/scripts/tunnel.sh
+/scripts/setup_nodes.sh
+/scripts/install_runtime.sh
+/scripts/configure_nodes.py
+/scripts/seed_demo.py
+/scripts/download_additional.py
+/docs/*.local.md

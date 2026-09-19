@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "templates": [
+    {
+      "id": "novel-traveler",
+      "kind": "character",
+      "name": "小说主角·旅人",
+      "trigger": "1girl",
+      "tags": ["silver hair", "blue eyes"],
+      "description": "A reserved young adult traveler.",
+      "categories": ["我的小说"],
+      "source": "user"
+    },
+    {
+      "id": "novel-travel-coat",
+      "kind": "outfit",
+      "name": "旅途外套",
+      "tags": ["navy blue long coat", "white blouse", "black boots"],
+      "categories": ["我的小说", "旅行装"],
+      "source": "user"
+    }
+  ]
+}

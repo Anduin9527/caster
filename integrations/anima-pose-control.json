@@ -1,0 +1,35 @@
+{
+  "repo": "Claquasse/Anima-Control-Pose",
+  "revision": "8f559771d5a49a02fa03f7df2a05ccb7eecb3a2a",
+  "rtmlib": "0.0.16",
+  "files": {
+    "README.md": "cc6afaa0cee54df958e8870a6cd542c43eb4374b726865b61f94e84b8a445a00",
+    "pose_control.json": "d12eab032efda35d1443374fd14eb6da2094f23c993b8d2bede23eb9ea6b8e18",
+    "anima_pose_preview2.safetensors": "c10fa11628e9b1bf16dfe095ac5c6dc4ddd9ae77d7fe023d0a1857f7e29c516f",
+    "metadata.json": "ad955596b03df01bdd3921fd32d42a0dbccfd3aee1b2405d5cca7affbb22f3a1",
+    "detector/yolox_m_8xb8-300e_humanart-c2c7a14a.onnx": "3dea6513388889f0fff4b77bf7a26013600321b9eb9ceb0e9a400a82572f5f23",
+    "detector/rtmw-dw-x-l_simcc-cocktail14_270e-256x192_20231122.onnx": "9a9bc17c13ff0a1e37507f45a037a21bc410cd08374b0e664c57d0080843aa58",
+    "comfyui/anima_control_lora/control_embedder.py": "f80a18f093a4bc39ef2b9defab74c1da7102d00470b318a3df11350f193075bd",
+    "comfyui/anima_control_lora/__init__.py": "7ea5e56918ae753fe2c139cd0fcd4f69add8c03361f9eabd3973c3eb3ee74851",
+    "comfyui/ComfyUI-anima-pose-control/requirements.txt": "14f572277e752fc6cba42c09d2c86bd0d085d5833f3b6a74d04ad15ac574fd2b",
+    "comfyui/ComfyUI-anima-pose-control/README.md": "db8a54368ecdfbc28cb62ffd023016cb2ba3d6f1c2dc52caa3c4a9c35658b295",
+    "comfyui/ComfyUI-anima-pose-control/keypoints.py": "8a0fa0b085570aec6aa03ecd60f57257163646f56c043a4c26bb1e04e87260be",
+    "comfyui/ComfyUI-anima-pose-control/__init__.py": "5637f8c628513d067ba1bb317c28c1b9937a1b1cf93358d627f8c43f554bc70f",
+    "comfyui/ComfyUI-anima-pose-control/pose_render.py": "17cff791183e60bba5a943ce1141ff2321f7a58bb54186f0e62863f471768a41",
+    "comfyui/ComfyUI-anima-pose-control/detect.py": "5219ceaa7c8ecbf80ec257d5326cff9658e8b87c125e556dd56f498691ca4692",
+    "comfyui/ComfyUI-anima-pose-control/node.py": "d9b5c2bffe80e561da202ae600a7b3623a6c7dd7934af0116d3169ffa8c0052a",
+    "comfyui/ComfyUI-anima-pose-control/js/anima_pose_control.js": "ad31fddbd953c8040450a82bc813b83af2f3c283365ce148dbc806182d58f13f",
+    "comfyui/ComfyUI-anima-pose-control/__pycache__/pose_render.cpython-312.pyc": "29ef13a72c8f6fcc0f4063f32894b05e571c1819fb1a43e872a022df3bd71ff3"
+  },
+  "local_patches": [
+    "4D image latent support",
+    "Execution-time device/dtype synchronization",
+    "Optional model latent normalization"
+  ],
+  "control_renderer": "rtmlib.draw_skeleton(openpose_skeleton=False), native 1024x1536",
+  "production_enabled": false,
+  "source_hashes": {
+    "control_embedder.py": "151bd9becd18ebb837074f08be5a774fa0d9f3936b82630145f048a73416b75a",
+    "__init__.py": "21f1338dc4e21a6cb7bd24dab8953d1f81a0014b74dd7cf14ff58be6bd63a426"
+  }
+}

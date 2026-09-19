@@ -1,0 +1,23 @@
+[
+  {
+    "name": "ComfyUI_VNCCS",
+    "commit": "2206d1743f7920a7b9a21f80f03777d9ddce74c3"
+  },
+  {
+    "name": "ComfyUI_VNCCS_Utils",
+    "commit": "70b752f2f1ac7a6aa22aa9418f730195c3cef58b"
+  },
+  {
+    "name": "ComfyUI-Impact-Pack",
+    "commit": "429d0159ad429e64d2b3916e6e7be9c22d025c3c"
+  },
+  {
+    "name": "ComfyUI-Impact-Subpack",
+    "commit": "50c7b71a6a224734cc9b21963c6d1926816a97f1"
+  },
+  {
+    "name": "ComfyUI-RMBG",
+    "commit": "58f1947a11567a9f8b707223185570850e773856",
+    "patch_file": "integrations/patches/ComfyUI-RMBG.patch"
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "repository": "https://github.com/ffdkj/ffdkj-Danbooru_Tag-Chinese-English-Translation-Table",
+  "revision": "4f9fb9f64ff9b57f3dcb2a8bb29c02cb5be98bcc",
+  "database_sha256": "073373bcc9b9668f54c6c0c461dac7ec12cf59024ab86727dd67a4852929cbe4",
+  "input_sha256": "bc973e566289916d459976e0b6ae219595172c5293ff155c2a1affca9fe4600c",
+  "method": "Exact name with spaces replaced by underscores; characters category=4, works category=3; no fuzzy matching",
+  "review_status": "upstream translations, not manually reviewed",
+  "coverage": {
+    "characters": {
+      "total": 7677,
+      "matched": 7458,
+      "unmatched": 219
+    },
+    "works": {
+      "total": 799,
+      "matched": 779,
+      "unmatched": 20
+    }
+  },
+  "license": "MIT",
+  "database_path": "data/translation/ffdkj/tag.sqlite"
+}

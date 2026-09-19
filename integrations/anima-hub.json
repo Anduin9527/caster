@@ -1,0 +1,19 @@
+{
+  "repository": "https://github.com/j955229/Comfyui-Anima-Tools-HUB",
+  "revision": "a0c351e81a24ebdbc7f47c524139a8dfe1226705",
+  "sha256": {
+    "character_official_data.json": "c16033f576cb58b436a1b8c4ead92f9eb8f6e58c1d2c1eec5baa0f79e0a76606",
+    "clothing_data.js": "ffc7c7c4e1b4568e71d41b4631dfd277ef1a28012b9e44c59585504e1856b520"
+  },
+  "counts": {
+    "character": 7999,
+    "outfit": 430
+  },
+  "license_note": "Upstream pyproject.toml declares MIT; no standalone LICENSE file in the inspected tree. Upstream code, images and catalog are not vendored; catalog is fetched explicitly into ignored runtime data.",
+  "preview_mapping": {
+    "character": "js/anima_hub.js getCharacterImageUrl: source_key name and copyright joined with comma-space, encoded as Animadex thumbnail filename",
+    "outfit": "Exact 430 id/preview pairs from pinned js/clothing_data.js; integrations/anima-outfit-previews.json",
+    "delivery": "Server-side proxychains downloader caches WebP under ignored data/template-previews; browser reads same-origin API with lazy loading and immutable HTTP cache. No runtime role/approval changes.",
+    "source": "https://github.com/j955229/Comfyui-Anima-Tools-HUB/blob/a0c351e81a24ebdbc7f47c524139a8dfe1226705/js/anima_hub.js"
+  }
+}

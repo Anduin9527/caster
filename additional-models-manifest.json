@@ -1,0 +1,59 @@
+[
+  {
+    "repo": "MIUProject/VNCCS_PoseStudio",
+    "revision": "ba45075903203e511b054443d9e1c2c313b719ef",
+    "filename": "models/loras/qwen/VNCCS/VNCCS_QIE2511_PoseStudio_ART_V5.9.5.safetensors",
+    "size": 1179883808,
+    "sha256": "f81f7f446f56188d96a1094ffe5d4183e7e4473d27eebb43e4c9555d3537bbb8",
+    "url": "https://huggingface.co/MIUProject/VNCCS_PoseStudio/resolve/ba45075903203e511b054443d9e1c2c313b719ef/models/loras/qwen/VNCCS/VNCCS_QIE2511_PoseStudio_ART_V5.9.5.safetensors"
+  },
+  {
+    "repo": "Bingsu/adetailer",
+    "revision": "53cc19de382014514d9d4038601d261a7faa9b7b",
+    "filename": "face_yolov8m.pt",
+    "size": 52026019,
+    "sha256": "717923c19b3f4bbf5250b728f1fa6b2cb72a33aed1d236ea9caf0e21ad943e5f",
+    "url": "https://huggingface.co/Bingsu/adetailer/resolve/53cc19de382014514d9d4038601d261a7faa9b7b/face_yolov8m.pt"
+  },
+  {
+    "repo": "1038lab/BiRefNet",
+    "revision": "4d000788a9698c7f8d67c8c6ce2b40c768f5b909",
+    "filename": "birefnet.py",
+    "size": 92068,
+    "sha256": "a9566611aa07a6fbb68ddb6ac8e19e62c879a428fbfc2f44efa53d233f2e302f",
+    "url": "https://huggingface.co/1038lab/BiRefNet/resolve/4d000788a9698c7f8d67c8c6ce2b40c768f5b909/birefnet.py"
+  },
+  {
+    "repo": "1038lab/BiRefNet",
+    "revision": "4d000788a9698c7f8d67c8c6ce2b40c768f5b909",
+    "filename": "BiRefNet_config.py",
+    "size": 298,
+    "sha256": "e7b8c2a74f6cea6a59553d517f71d47f2c1d90e670a13416af17c25fe2f3dc52",
+    "url": "https://huggingface.co/1038lab/BiRefNet/resolve/4d000788a9698c7f8d67c8c6ce2b40c768f5b909/BiRefNet_config.py"
+  },
+  {
+    "repo": "1038lab/BiRefNet",
+    "revision": "4d000788a9698c7f8d67c8c6ce2b40c768f5b909",
+    "filename": "config.json",
+    "size": 402,
+    "sha256": "966a1f0165b072d2d1309756e71907750e535ba5c3790d8cd0e69713ff3a56cd",
+    "url": "https://huggingface.co/1038lab/BiRefNet/resolve/4d000788a9698c7f8d67c8c6ce2b40c768f5b909/config.json"
+  },
+  {
+    "repo": "1038lab/BiRefNet",
+    "revision": "4d000788a9698c7f8d67c8c6ce2b40c768f5b909",
+    "filename": "BiRefNet-general.safetensors",
+    "size": 884878856,
+    "sha256": "77277264c0e8c74149d3ff2fade4fd8176965b7108f3c5fc3b8c9c811edb4519",
+    "url": "https://huggingface.co/1038lab/BiRefNet/resolve/4d000788a9698c7f8d67c8c6ce2b40c768f5b909/BiRefNet-general.safetensors"
+  },
+  {
+    "repo": "facebookresearch/segment-anything",
+    "revision": "sam_vit_b_01ec64",
+    "filename": "sam_vit_b_01ec64.pth",
+    "size": 375042383,
+    "sha256": "ec2df62732614e57411cdcf32a23ffdf28910380d03139ee0f4fcbe91eb8c912",
+    "url": "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth",
+    "checksum_source": "https://huggingface.co/comfyuistudio/sam_vit_b_01ec64.pth/blob/7caec16ec1a498befaf9b0d77b8f1a9b9da12083/sam_vit_b_01ec64.pth"
+  }
+]

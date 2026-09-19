@@ -1,0 +1,58 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><title>Pose Studio 预设渲染缓存</title>
+<style>body{font:16px sans-serif;background:white;color:black}canvas{width:512px;height:512px}img{width:180px}button{padding:15px}</style>
+<h1>Pose Studio 预设渲染缓存</h1><p>仅使用 WebGL 渲染姿态，无模型推理。</p>
+<button id="run">渲染 16 个预设 × 7 种尺寸</button><pre id="status">等待开始</pre><canvas id="viewer" width="512" height="512"></canvas><div id="results"></div>
+<script type="module">
+import {PoseViewerCore} from '/runtime/vnccs_pose_studio_core.js';
+import {parseMorphPack,solveMorph,buildStaticModelData} from '/runtime/vnccs_pose_morph_runtime.mjs';
+document.querySelector('#run').onclick=async()=>{
+ const status=document.querySelector('#status'); document.querySelector('#run').disabled=true;
+ try{
+ status.textContent='加载官方模型…';
+ const response=await fetch('/runtime/assets/pose_studio_makehuman.v2.bin.gz');
+ const raw=await new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+ const pack=parseMorphPack(raw);
+ const model=solveMorph(pack,{age:27,gender:0.5,weight:0.5,muscle:0.5,height:0.5});
+ const st=buildStaticModelData(pack,false);
+ const bones=st.bones.map((bone,index)=>{
+ const headPos=Array.from(model.bonePositions.subarray(index*6,index*6+3));
+ const tailPos=Array.from(model.bonePositions.subarray(index*6+3,index*6+6));
+ return {...bone,parent:bone.parent||null,headPos,tailPos,length:Math.hypot(...tailPos.map((v,i)=>v-headPos[i]))};
+ });
+ const viewer=new PoseViewerCore(document.querySelector('#viewer'),{enableTextureSkinning:false});
+ await viewer.init();
+ viewer.setDirectionalSkydomeVisible(false);
+ viewer.updateLights([{type:'ambient',color:'#ffffff',intensity:1.2},{type:'directional',color:'#ffffff',intensity:2,x:5,y:15,z:20}]);
+ viewer.loadData({status:'success',vertices:model.vertices,uvs:st.uvs,indices:st.indices,bones,skinIndices:st.skinIndices,skinWeights:st.skinWeights,landmarks:model.landmarks,landmark_indices:model.landmarkIndices});
+ const manifest=await(await fetch('/manifest.json')).json();
+ const THREE=viewer.THREE;
+ const canvases=await(await fetch('/canvas-presets.json')).json();
+ for(const item of manifest.poses){
+ for(const {width,height} of canvases){
+ status.textContent='渲染 '+item.display_name+' '+width+'×'+height;
+ const pose=await(await fetch('/library/'+item.json_path)).json();
+ viewer.setPose(pose,true);
+ // Fit the actually posed, skinned vertices with a consistent front camera.
+ viewer.skinnedMesh.updateMatrixWorld(true); viewer.skeleton.update();
+ const box=new THREE.Box3(),point=new THREE.Vector3();
+ const geo=viewer.skinnedMesh.geometry;
+ for(const i of new Set(geo.index.array)){
+ point.fromBufferAttribute(geo.attributes.position,i);
+ viewer.skinnedMesh.applyBoneTransform(i,point);
+ point.applyMatrix4(viewer.skinnedMesh.matrixWorld); box.expandByPoint(point);
+ }
+ viewer.sceneCameraTarget=box.getCenter(new THREE.Vector3());
+ const size=box.getSize(new THREE.Vector3());
+ const availableHeight=2*(45-size.z/2)*Math.tan(Math.PI/12);
+ const zoom=availableHeight/(Math.max(size.x/(width/height),size.y)*1.08);
+ const data=viewer.capture(width,height,zoom,[255,255,255]);
+ const blob=await(await fetch(data.startsWith('data:')?data:'data:image/png;base64,'+data)).blob();
+ const saved=await fetch('/render/'+item.id+'-'+width+'x'+height,{method:'POST',body:blob});
+ if(!saved.ok)throw new Error('保存失败 '+item.name);
+ const img=document.createElement('img');img.src=URL.createObjectURL(blob);img.alt=item.display_name;document.querySelector('#results').append(img);
+ }
+ }
+ status.textContent='完成：112 / 112';
+ }catch(e){status.textContent='失败：'+e.message;console.error(e)}
+};
+</script></html>

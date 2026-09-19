@@ -1,0 +1,249 @@
+{
+  "sprite": {
+    "fields": {
+      "positive": [
+        [
+          "4",
+          "text"
+        ]
+      ],
+      "negative": [
+        [
+          "5",
+          "text"
+        ]
+      ],
+      "seed": [
+        [
+          "7",
+          "noise_seed"
+        ]
+      ],
+      "prefix": [
+        [
+          "9",
+          "filename_prefix"
+        ]
+      ],
+      "width": [
+        [
+          "6",
+          "width"
+        ]
+      ],
+      "height": [
+        [
+          "6",
+          "height"
+        ]
+      ]
+    },
+    "outputs": {
+      "9": "original"
+    }
+  },
+  "background": {
+    "fields": {
+      "positive": [
+        [
+          "4",
+          "text"
+        ]
+      ],
+      "negative": [
+        [
+          "5",
+          "text"
+        ]
+      ],
+      "seed": [
+        [
+          "7",
+          "noise_seed"
+        ]
+      ],
+      "prefix": [
+        [
+          "9",
+          "filename_prefix"
+        ]
+      ]
+    },
+    "outputs": {
+      "9": "original"
+    }
+  },
+  "pose": {
+    "fields": {
+      "reference": [
+        [
+          "7",
+          "image"
+        ]
+      ],
+      "pose": [
+        [
+          "12",
+          "image"
+        ]
+      ],
+      "positive": [
+        [
+          "8",
+          "prompt"
+        ]
+      ],
+      "seed": [
+        [
+          "9",
+          "seed"
+        ]
+      ],
+      "prefix": [
+        [
+          "11",
+          "filename_prefix"
+        ]
+      ],
+      "width": [
+        [
+          "8",
+          "width"
+        ]
+      ],
+      "height": [
+        [
+          "8",
+          "height"
+        ]
+      ]
+    },
+    "outputs": {
+      "11": "original"
+    }
+  },
+  "expression": {
+    "fields": {
+      "reference": [
+        [
+          "7",
+          "image"
+        ]
+      ],
+      "region": [
+        [
+          "14",
+          "region"
+        ]
+      ],
+      "mask": [
+        [
+          "14",
+          "mask_file"
+        ]
+      ],
+      "positive": [
+        [
+          "8",
+          "prompt"
+        ]
+      ],
+      "seed": [
+        [
+          "9",
+          "seed"
+        ]
+      ],
+      "prefix": [
+        [
+          "11",
+          "filename_prefix"
+        ],
+        [
+          "17",
+          "filename_prefix"
+        ],
+        [
+          "18",
+          "filename_prefix"
+        ],
+        [
+          "19",
+          "filename_prefix"
+        ],
+        [
+          "20",
+          "filename_prefix"
+        ]
+      ]
+    },
+    "outputs": {
+      "11": "original",
+      "17": "mask",
+      "18": "crop",
+      "19": "edited_crop",
+      "20": "detection"
+    }
+  },
+  "matte": {
+    "fields": {
+      "reference": [
+        [
+          "1",
+          "image"
+        ]
+      ],
+      "prefix": [
+        [
+          "3",
+          "filename_prefix"
+        ],
+        [
+          "4",
+          "filename_prefix"
+        ]
+      ]
+    },
+    "outputs": {
+      "3": "transparent",
+      "4": "mask"
+    }
+  },
+  "outfit": {
+    "fields": {
+      "reference": [
+        [
+          "13",
+          "image"
+        ]
+      ],
+      "positive": [
+        [
+          "4",
+          "text"
+        ]
+      ],
+      "negative": [
+        [
+          "5",
+          "text"
+        ]
+      ],
+      "seed": [
+        [
+          "7",
+          "seed"
+        ]
+      ],
+      "prefix": [
+        [
+          "9",
+          "filename_prefix"
+        ]
+      ]
+    },
+    "outputs": {
+      "9": "original"
+    }
+  }
+}

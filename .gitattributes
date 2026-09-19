@@ -1,0 +1,3 @@
+
+# Preserve upstream whitespace in patch context.
+integrations/patches/*.patch -whitespace
