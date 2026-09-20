@@ -3,6 +3,7 @@
 Uses an existing Pose Studio runtime copied into data/pose-studio-runtime.
 Only writes validated render PNGs for the pinned catalog; never submits inference.
 """
+from _config import API_URL, COMFY_URL, DATA_DIR
 import hashlib
 import io
 import json
@@ -25,9 +26,9 @@ class Handler(BaseHTTPRequestHandler):
         elif path == '/manifest.json':
             file = ROOT / 'integrations/pose-studio-library.json'; base = file.parent
         elif path.startswith('/runtime/'):
-            base = ROOT / 'data/pose-studio-runtime'; file = base / path[len('/runtime/'):]
+            base = DATA_DIR / 'pose-studio-runtime'; file = base / path[len('/runtime/'):]
         elif path.startswith('/library/'):
-            base = ROOT / 'data/pose-studio-library'; file = base / path[len('/library/'):]
+            base = DATA_DIR / 'pose-studio-library'; file = base / path[len('/library/'):]
         else:
             self.send_error(404); return
         if not file.resolve().is_relative_to(base.resolve()) or not file.is_file():
@@ -45,7 +46,7 @@ class Handler(BaseHTTPRequestHandler):
         if image.format != 'PNG' or image.size != tuple(map(int, identifier.split('-')[1].split('x'))):
             self.send_error(400); return
         output = io.BytesIO(); image.convert('RGB').save(output,format='PNG')
-        directory = ROOT / 'data/pose-studio-library/renders'; directory.mkdir(exist_ok=True)
+        directory = DATA_DIR / 'pose-studio-library/renders'; directory.mkdir(exist_ok=True)
         (directory / (identifier + '.png')).write_bytes(output.getvalue())
         self.send_response(200); self.end_headers(); self.wfile.write(b'OK')
 

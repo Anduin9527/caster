@@ -33,4 +33,4 @@ npm run dev -- --port 4173 --strictPort
 
 `AIGC_DATA_DIR` 保存数据库、模板、缓存和资产。升级时备份该目录，再同步源码并安装锁定依赖。ComfyUI 使用独立 GPU 环境，生成任务串行执行。
 
-后端服务管理可用 `scripts/service.py start|status|stop`；该脚本用于 Linux，默认检查本地 8189 端口。前端接口详情见 [前端说明](../frontend/README.md)。
+后端服务管理可用 `scripts/service.py start|status|stop`；该脚本用于 Linux，按 `config.env` 中的 `AIGC_API_URL` 检查服务。前端接口详情见 [前端说明](../frontend/README.md)。

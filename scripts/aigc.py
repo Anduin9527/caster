@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Small CLI: JSON manifests, explicit approvals, persistent pose import."""
+from _config import API_URL, COMFY_URL, DATA_DIR
 import argparse,json,sys
 from pathlib import Path
 import httpx
-p=argparse.ArgumentParser();p.add_argument('--url',default='http://127.0.0.1:8189');sub=p.add_subparsers(dest='cmd',required=True)
+p=argparse.ArgumentParser();p.add_argument('--url',default=API_URL);sub=p.add_subparsers(dest='cmd',required=True)
 a=sub.add_parser('request');a.add_argument('method');a.add_argument('route');a.add_argument('--json',type=Path)
 a=sub.add_parser('batch');a.add_argument('manifest',type=Path);a.add_argument('--receipts',type=Path)
 a=sub.add_parser('upload');a.add_argument('image',type=Path);a.add_argument('--role',default='reference',choices=['reference','mask','pose_render'])

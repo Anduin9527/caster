@@ -1,4 +1,5 @@
 """Resume upstream thumbnail downloads into ignored backend data; no inference or approvals."""
+from _config import API_URL, COMFY_URL, DATA_DIR
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import fcntl
@@ -14,7 +15,7 @@ from aigc.template_previews import fetch_preview, source_url, atomic_write
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--data-dir', type=Path, default=Path('data'))
+    parser.add_argument('--data-dir', type=Path, default=DATA_DIR)
     parser.add_argument('--workers', type=int, default=4, choices=range(1,9))
     parser.add_argument('--limit', type=int, default=0)
     args = parser.parse_args()

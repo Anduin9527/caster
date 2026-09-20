@@ -13,6 +13,8 @@
 | CASTER_AnimaControl | `custom_nodes/CASTER_AnimaControl/` | 姿态控制实验 | 可选 |
 | ComfyUI_VNCCS | 上游 | Qwen 多图编码 | **必需** |
 | ComfyUI_VNCCS_Utils | 上游 | Pose Studio 渲染 | **必需** |
+| ComfyUI-Impact-Pack / Subpack | 上游 | SAM 与人脸检测器 | **必需** |
+| ComfyUI-RMBG | 上游 | BiRefNet 抠图 | **必需** |
 
 安装方式：
 ```bash
@@ -20,6 +22,10 @@ cd ComfyUI/custom_nodes
 # 安装上游节点
 git clone https://github.com/AHEKOT/ComfyUI_VNCCS
 git clone https://github.com/AHEKOT/ComfyUI_VNCCS_Utils
+git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack
+git clone https://github.com/ltdrdata/ComfyUI-Impact-Subpack
+git clone https://github.com/1038lab/ComfyUI-RMBG
+# 各节点切换至 nodes-manifest.json 记录的 commit，再安装其 requirements.txt
 
 # 链接本项目节点
 ln -s /path/to/caster/custom_nodes/AIGC_LocalEdit .
@@ -36,10 +42,7 @@ ln -s /path/to/caster/custom_nodes/CASTER_AnimaControl .  # 可选
 - **Pose Studio LoRA**：姿态控制
 - **SAM**：脸部掩码生成
 
-模型下载脚本：
-```bash
-# 按 models-manifest.json 和 additional-models-manifest.json 下载固定版本模型到 ComfyUI
-```
+按清单中的 URL 下载并校验 SHA256，再放入 ComfyUI 对应的模型目录。节点适配补丁由 `nodes-manifest.json` 的 `patch_file` 指定。
 
 ### 4. Python 和 Node.js
 - Python 3.12（推荐使用 uv 管理）
@@ -52,8 +55,7 @@ ln -s /path/to/caster/custom_nodes/CASTER_AnimaControl .  # 可选
 
 ### 开发工具
 - pytest：单元测试
-- ruff：代码检查
-- Vitest：前端测试
+- Node.js test runner / tsx：前端测试
 
 ### 实验功能
 - `scripts/render_pose_studio.py`：本地渲染 Pose Studio 人偶（需要浏览器）
@@ -71,11 +73,7 @@ ln -s /path/to/caster/custom_nodes/CASTER_AnimaControl .  # 可选
 - 串行推理（一次一个任务）
 - 支持的画布尺寸：1024×1536 及其他预设
 
-### 较小配置（社区反馈）
-更小的显存（如 RTX 3060 12GB）可能可用，但需要：
-- 调整批量大小
-- 启用模型量化
-- 减少并发任务
+其他硬件配置尚未验证。
 
 ---
 

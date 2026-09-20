@@ -11,9 +11,11 @@ from .comfy import Comfy
 from .worker import Worker
 from .llm import parse_scene
 
+from .config import load
+CONFIG=load()
 ROOT=Path(__file__).resolve().parents[1]
-store=Store(os.environ.get('AIGC_DATA_DIR',str(ROOT/'data')))
-comfy=Comfy(os.environ.get('AIGC_COMFY_URL','http://127.0.0.1:8188'))
+store=Store(CONFIG['AIGC_DATA_DIR'])
+comfy=Comfy(CONFIG['AIGC_COMFY_URL'])
 
 @asynccontextmanager
 async def lifespan(app):

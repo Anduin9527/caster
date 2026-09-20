@@ -10,7 +10,7 @@ npm ci
 npm run dev -- --port 4173 --strictPort
 ```
 
-开发服务仅监听回环，`/api` 同源代理默认连接本机 `127.0.0.1:8189` SSH 隧道。隧道配置见 `../docs/OPERATIONS.md`；可通过 `CASTER_API_TARGET` 覆盖代理目标。不要将凭据写入客户端。构建使用 `npm run build`，本轮没有公开部署网站。
+开发服务仅监听回环，`/api` 同源代理默认连接本机 `127.0.0.1:8189` SSH 隧道。隧道配置见 `../docs/OPERATIONS.md`；代理目标读取根目录 `config.env` 的 `AIGC_API_URL`，开发端口读取 `AIGC_UI_URL`。先在根目录运行 `uv sync --locked --group dev` 准备配置读取环境。不要将凭据写入客户端。构建使用 `npm run build`，本轮没有公开部署网站。
 
 ## 制作流程
 

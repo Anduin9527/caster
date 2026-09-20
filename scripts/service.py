@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from _config import API_URL, COMFY_URL, DATA_DIR
 import os,sys,json,signal,subprocess,time,fcntl,urllib.request
 from pathlib import Path
 root=Path(__file__).resolve().parents[1];state=root/'service.json'
@@ -29,14 +30,14 @@ elif cmd=='start':
         state.write_text(json.dumps({'pid':p.pid,'ticks':ticks(p.pid)}))
         for _ in range(100):
             try:
-                d=json.load(urllib.request.urlopen('http://127.0.0.1:8189/health',timeout=1))
+                d=json.load(urllib.request.urlopen(API_URL+'/health',timeout=1))
                 if d['worker_alive'] and owned():break
             except Exception:pass
             time.sleep(.2)
         else:raise SystemExit('Startup failed: see backend.log')
     print(json.dumps({'running':bool(owned()),'service':owned()}))
 elif cmd=='status':
-    try:health=json.load(urllib.request.urlopen('http://127.0.0.1:8189/health',timeout=2))
+    try:health=json.load(urllib.request.urlopen(API_URL+'/health',timeout=2))
     except Exception:health=None
     print(json.dumps({'running':bool(s),'service':s,'health':health}))
 else:raise SystemExit('usage: service.py start|stop|status')

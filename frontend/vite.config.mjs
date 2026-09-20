@@ -1,6 +1,12 @@
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { demoDownloads } from "./scripts/downloads.mjs";
+
+const root = fileURLToPath(new URL("../", import.meta.url));
+const config = JSON.parse(execFileSync(root + ".venv/bin/python", ["-m", "aigc.config"], { cwd: root, encoding: "utf8" }));
+const ui = new URL(config.AIGC_UI_URL);
 
 export default defineConfig({
   build: {
@@ -10,10 +16,11 @@ export default defineConfig({
     include: ["react", "react-dom/client"],
   },
   server: {
-    host: "127.0.0.1",
+    host: ui.hostname,
+    port: Number(ui.port || 4173),
     proxy: {
       "/api": {
-        target: process.env.CASTER_API_TARGET || "http://127.0.0.1:8189",
+        target: config.AIGC_API_URL,
         changeOrigin: false,
         rewrite: (path) => path.replace(/^\/api/, ""),
         timeout: 65000,

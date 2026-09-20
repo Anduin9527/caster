@@ -2,6 +2,7 @@
 
 Run through the existing proxychains configuration on the deployment host.
 """
+from _config import API_URL, COMFY_URL, DATA_DIR
 import concurrent.futures
 import hashlib
 import json
@@ -15,7 +16,7 @@ MANIFEST = json.loads((ROOT / 'integrations/pose-studio-library.json').read_text
 def fetch(item):
     for kind in ('json', 'preview'):
         relative = item[kind + '_path']
-        path = ROOT / 'data/pose-studio-library' / relative
+        path = DATA_DIR / 'pose-studio-library' / relative
         expected = item[kind + '_sha256']
         if path.exists() and hashlib.sha256(path.read_bytes()).hexdigest() == expected:
             continue

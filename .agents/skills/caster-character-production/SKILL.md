@@ -21,9 +21,11 @@ description: 通过自然语言描述制作角色资产：匹配模板、规划�
 
 ### 1. 读取服务配置
 
+根目录 `config.env` 是本地配置入口，通过 `aigc.config.load()` 读取；显式环境变量用于临时覆盖。下面命令中的回环地址仅示意接口路径，执行时替换为配置返回的地址。配置文件中的凭据不输出到对话或生成记录。
+
 ```bash
-# 查看配置示例
-cat config.env.example
+# 读取本地运行配置，输出仅限公开服务地址
+uv run --locked python -m aigc.config
 
 # 检查服务状态
 curl http://127.0.0.1:8189/health
@@ -31,8 +33,8 @@ curl http://127.0.0.1:8189/production/capabilities
 ```
 
 **关键信息**：
-- 后端地址：默认 `http://127.0.0.1:8189`
-- 数据目录：环境变量 `AIGC_DATA_DIR` 或默认 `data/local-dev`
+- 后端地址：读取 `aigc.config.load()` 返回的 `AIGC_API_URL`
+- 数据目录：读取同一配置中的 `AIGC_DATA_DIR`
 - ComfyUI 状态：`capabilities.generation_online`
 - 支持的输入：`capabilities.pose_input` (pose_studio_3d)
 

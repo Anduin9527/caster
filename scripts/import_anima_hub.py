@@ -1,4 +1,5 @@
 """Fetch a pinned Hub catalog or read a local snapshot; never runs Hub code."""
+from _config import API_URL, COMFY_URL, DATA_DIR
 import argparse
 import hashlib
 import json
@@ -14,7 +15,7 @@ from aigc.store import Store
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source-dir', type=Path, help='Directory containing js/ from the pinned Hub revision')
-    parser.add_argument('--output', type=Path, default=Path('data/anima-hub.templates.json'))
+    parser.add_argument('--output', type=Path, default=DATA_DIR/'anima-hub.templates.json')
     parser.add_argument('--data-dir', type=Path, help='Optionally import into this local CASTER data directory')
     args = parser.parse_args()
     pinned = json.loads((Path(__file__).resolve().parents[1]/'integrations/anima-hub.json').read_text())

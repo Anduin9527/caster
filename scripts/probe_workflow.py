@@ -3,6 +3,7 @@
 Stores submission intent before submitting; uncertain submissions are reconciled,
 never replayed. Invoke separately for each explicitly selected test stage.
 """
+from _config import API_URL, COMFY_URL, DATA_DIR
 import argparse, asyncio, fcntl, hashlib, json, sys, time
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
@@ -19,7 +20,7 @@ async def run(root, stage):
     if record.get('status')=='complete':
         for f,h in record['files'].items():assert hashlib.sha256((root/f).read_bytes()).hexdigest()==h
         print('Already complete');return
-    c=Comfy('http://127.0.0.1:8188')
+    c=Comfy(COMFY_URL)
     try:
         pid=record.get('prompt_id')
         if not pid and record.get('submit_started'):

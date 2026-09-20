@@ -1,8 +1,9 @@
 """Produce ComfyUI frontend graphs from explicit API graph + runtime node schemas."""
+from _config import API_URL, COMFY_URL, DATA_DIR
 import json,urllib.request
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
-info=json.load(urllib.request.urlopen('http://127.0.0.1:8188/object_info'))
+info=json.load(urllib.request.urlopen(COMFY_URL+'/object_info'))
 def convert(graph):
     nodes=[];links=[];node_map={};link_id=0
     anima = any('anima' in str(n.get('inputs', {}).get('unet_name', '')).lower() for n in graph.values())
