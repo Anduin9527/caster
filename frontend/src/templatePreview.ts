@@ -18,7 +18,8 @@ export function templateSource(t: Template): string | undefined {
 }
 
 export function templatePreview(t: Template): string | undefined {
-  if (!templateSource(t)) return;
+  const generated = t.kind === "outfit" && t.source === "caster://curated-outfits-v1";
+  if (!generated && !templateSource(t)) return;
   const version = encodeURIComponent(`${t.source_revision}:${t.source_key}`);
   return `/api/prompt-templates/${encodeURIComponent(t.id)}/image?v=${version}`;
 }

@@ -245,5 +245,42 @@
     "outputs": {
       "9": "original"
     }
+  },
+  "anima_free": {
+    "fields": {
+      "reference": [
+        [
+          "13",
+          "image"
+        ]
+      ],
+      "positive": [
+        [
+          "4",
+          "text"
+        ]
+      ],
+      "negative": [
+        [
+          "5",
+          "text"
+        ]
+      ],
+      "seed": [
+        [
+          "7",
+          "seed"
+        ]
+      ],
+      "prefix": [
+        [
+          "9",
+          "filename_prefix"
+        ]
+      ]
+    },
+    "outputs": {
+      "9": "original"
+    }
   }
 }

@@ -1,7 +1,10 @@
+import { useStepNavigation } from "./useStepNavigation";
+import { Modal } from "./components/Modal";
+import { TemplateDrawer } from "./components/TemplateDrawer";
+import { Empty } from "./components/Empty";
 import { Select } from "./Select";
-import { templatePreview } from "./templatePreview";
 import { ProductionRecords } from "./ProductionRecords";
-import { useEffect, useRef, useId, useState, type ReactNode } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   ArrowRight,
   ArrowLeft,
@@ -13,26 +16,18 @@ import {
   Clock,
   Images,
   DownloadSimple,
-  MagnifyingGlass,
-  UploadSimple,
-  ArrowCounterClockwise,
   WarningCircle,
   CheckCircle,
   Circle,
   SpinnerGap,
   Eye,
-  PencilSimple,
   Stack,
   WifiSlash,
-  CaretDown,
   Flower,
   Paperclip,
-  PushPin,
   Person,
-  CoatHanger,
   Smiley,
   Sparkle,
-  Trash,
   ArrowsOut,
 } from "@phosphor-icons/react";
 import {
@@ -46,11 +41,9 @@ import {
   stateNames,
   current,
   identityReady,
-  outfitReady,
   selectedOutfit,
   poseReady,
   canStep,
-  composedPrompt,
   enqueue,
   reviewAsset,
   cancelJob,
@@ -76,7 +69,6 @@ const reviewNames = {
   approved: "已确认",
   rejected: "需修正",
 };
-const stageIcons = [Person, Eye, CoatHanger, Person, Smiley, DownloadSimple];
 function ImageSample({
   src,
   alt,
@@ -100,54 +92,6 @@ function ImageSample({
       alt={alt}
       onError={() => setFailed(true)}
     />
-  );
-}
-export function Modal({
-  title,
-  children,
-  onClose,
-  wide = false,
-}: {
-  title: string;
-  children: ReactNode;
-  onClose: () => void;
-  wide?: boolean;
-}) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const opener = useRef<HTMLElement | null>(null);
-  const titleId = useId();
-  useEffect(() => {
-    if (!opener.current) opener.current = document.activeElement as HTMLElement;
-    const dialog = ref.current!;
-    dialog.showModal();
-    return () => {
-      dialog.close();
-      queueMicrotask(() => {
-        if (opener.current?.isConnected) opener.current.focus();
-      });
-    };
-  }, []);
-  return (
-    <dialog
-      ref={ref}
-      aria-labelledby={titleId}
-      className={wide ? "modal wide" : "modal"}
-      onCancel={(e) => {
-        e.preventDefault();
-        onClose();
-      }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="modal-top">
-        <h2 id={titleId}>{title}</h2>
-        <button aria-label="关闭弹窗" className="icon-button" onClick={onClose}>
-          <X size={22} />
-        </button>
-      </div>
-      {children}
-    </dialog>
   );
 }
 function PoseDrawing({ index }: { index: number }) {
@@ -209,23 +153,7 @@ function PoseDrawing({ index }: { index: number }) {
 }
 export function App() {
   const [s, setS] = useState<State>(() => demoRepository.load());
-  const stepsRef = useRef<HTMLElement>(null);
-  useEffect(() => {
-    const nav = stepsRef.current;
-    if (!nav) return;
-    const revealStep = () => {
-      const active = nav.querySelector<HTMLElement>('[aria-current="step"]');
-      if (!active || nav.scrollWidth <= nav.clientWidth) return;
-      const bounds = active.getBoundingClientRect(),
-        viewport = nav.getBoundingClientRect();
-      nav.scrollLeft +=
-        bounds.left - viewport.left - (nav.clientWidth - bounds.width) / 2;
-    };
-    revealStep();
-    const observer = new ResizeObserver(revealStep);
-    observer.observe(nav);
-    return () => observer.disconnect();
-  }, [s.step]);
+  const stepsRef = useStepNavigation(s.step);
   const [catalog, setCatalog] = useState<Template[]>([]);
   const [catalogStatus, setCatalogStatus] = useState("正在连接 服务器模板库…");
   const [libraryMode, setLibraryMode] = useState<"server" | "demo">("server");
@@ -2079,16 +2007,6 @@ export function App() {
     </div>
   );
 }
-function Empty({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="empty-state">
-      <Images size={46} weight="light" />
-      <h3>{title}</h3>
-      <p>{text}</p>
-      <span className="dashed-note">每一次尝试，都会留下记录。</span>
-    </div>
-  );
-}
 function CustomMood({
   onAdd,
 }: {
@@ -2179,423 +2097,6 @@ function NewOutfit({
           添加到衣橱
         </button>
       </form>
-    </Modal>
-  );
-}
-function TemplateImage({ template }: { template: Template }) {
-  const url = templatePreview(template);
-  const [failed, setFailed] = useState(false);
-  if (!url) return <span className="template-image-empty">暂无配套图片</span>;
-  if (failed)
-    return <span className="template-image-empty">预览图暂时无法加载</span>;
-  return (
-    <img
-      className="template-preview"
-      src={url}
-      alt={`${template.name} · 上游参考图`}
-      loading="lazy"
-      decoding="async"
-      referrerPolicy="no-referrer"
-      onError={() => setFailed(true)}
-    />
-  );
-}
-
-export function TemplateDrawer({
-  remote = false,
-  kind,
-  catalog,
-  personal,
-  status,
-  onApply,
-  onClose,
-  onImport,
-  onEdit,
-}: {
-  remote?: boolean;
-  kind: Kind;
-  catalog: Template[];
-  personal: Template[];
-  status: string;
-  onApply: (t: Template) => void;
-  onClose: () => void;
-  onImport: (items: Template[]) => Promise<void>;
-  onEdit: (t: Template) => Promise<void>;
-}) {
-  const [tab, setTab] = useState<"upstream" | "personal">("upstream"),
-    [q, setQ] = useState(""),
-    [category, setCategory] = useState(""),
-    [page, setPage] = useState(0),
-    [selected, setSelected] = useState<Template | null>(null),
-    [error, setError] = useState(""),
-    [editing, setEditing] = useState("");
-  const items = (tab === "upstream" ? catalog : personal).filter(
-    (t) => t.kind === kind,
-  );
-  const localCategories = [
-    ...new Set(items.flatMap((t) => t.categories || [])),
-  ].sort();
-  const results = items.filter(
-    (t) =>
-      (!category || t.categories?.includes(category)) &&
-      JSON.stringify(t).toLocaleLowerCase().includes(q.toLocaleLowerCase()),
-  );
-  const [remotePage, setRemotePage] = useState<{
-    items: Template[];
-    total: number;
-    categories: string[];
-    category_labels?: Record<string, string>;
-  }>({ items: [], total: 0, categories: [] });
-  const [loading, setLoading] = useState(remote);
-  const [loadError, setLoadError] = useState("");
-  const [refresh, setRefresh] = useState(0);
-  useEffect(() => {
-    if (!remote) return;
-    let live = true;
-    setLoading(true);
-    setLoadError("");
-    const timer = setTimeout(
-      () => {
-        serverLibrary
-          .page({
-            kind,
-            source: tab === "personal" ? "user" : "upstream",
-            q,
-            category,
-            offset: page * 12,
-          })
-          .then((data) => {
-            if (live) setRemotePage(data);
-          })
-          .catch((e) => {
-            if (live) setLoadError(e.message);
-          })
-          .finally(() => {
-            if (live) setLoading(false);
-          });
-      },
-      q ? 250 : 0,
-    );
-    return () => {
-      live = false;
-      clearTimeout(timer);
-    };
-  }, [remote, kind, tab, q, category, page, refresh]);
-  const categories = remote ? remotePage.categories : localCategories;
-  const visible = remote
-    ? loading || loadError
-      ? []
-      : remotePage.items
-    : results.slice(page * 12, page * 12 + 12);
-  const total = remote ? remotePage.total : results.length;
-  useEffect(() => setPage(0), [q, category, tab]);
-  async function upload(file?: File) {
-    if (!file) return;
-    try {
-      if (file.size > 16 * 1024 * 1024) throw Error("文件不得超过 16 MiB");
-      const data = parseBundle(await file.text());
-      await onImport(data);
-      setRefresh((r) => r + 1);
-      setTab("personal");
-      setError(`已处理 ${data.length} 个模板；相同条目会跳过。`);
-    } catch (e) {
-      setError(
-        e instanceof SyntaxError
-          ? "JSON 格式错误，请检查引号、逗号和括号；未保存任何内容。"
-          : (e as Error).message,
-      );
-    }
-  }
-  return (
-    <Modal
-      wide
-      title={kind === "character" ? "角色模板图书馆" : "服装模板图书馆"}
-      onClose={onClose}
-    >
-      <div className="template-toolbar">
-        <div className="button-row">
-          <button
-            className={tab === "upstream" ? "selected" : ""}
-            onClick={() => {
-              setTab("upstream");
-              setCategory("");
-              setSelected(null);
-            }}
-          >
-            角色与服装
-          </button>
-          <button
-            className={tab === "personal" ? "selected" : ""}
-            onClick={() => {
-              setTab("personal");
-              setCategory("");
-              setSelected(null);
-            }}
-          >
-            我的模板
-          </button>
-        </div>
-        <details className="template-manage">
-          <summary>管理模板</summary>
-          <div className="disclosure-content">
-            <label className="file-button">
-              <UploadSimple size={16} />
-              导入 JSON
-              <input
-                type="file"
-                accept=".json,application/json"
-                onChange={(e) => {
-                  upload(e.target.files?.[0]);
-                  e.target.value = "";
-                }}
-              />
-            </label>
-            <button
-              onClick={async () => {
-                try {
-                  const templates = remote
-                    ? (await serverLibrary.templates()).filter(
-                        (t) => t.source === "user",
-                      )
-                    : personal;
-                  await saveJSON(
-                    { schema_version: 1, templates },
-                    "caster-personal-templates.json",
-                  );
-                } catch (e) {
-                  setError((e as Error).message);
-                }
-              }}
-            >
-              <DownloadSimple size={16} />
-              导出个人库
-            </button>
-          </div>
-        </details>
-      </div>
-      <details className="template-storage">
-        <summary>模板保存位置</summary>
-        <div className="disclosure-content">
-          <p className="muted small">{status}</p>
-        </div>
-      </details>
-      <div className="template-search">
-        <label className="search-field">
-          <MagnifyingGlass size={18} />
-          <input
-            aria-label="搜索模板"
-            placeholder="搜索中文 / 英文名称、作品或 Tag…"
-            value={q}
-            onChange={(e) => {
-              setQ(e.target.value);
-              setPage(0);
-            }}
-          />
-        </label>
-        <Select
-          aria-label="模板分类"
-          value={category}
-          onValueChange={(value) => {
-            setCategory(value);
-            setPage(0);
-          }}
-        >
-          <option value="">全部分类</option>
-          {categories.map((c) => (
-            <option key={c} value={c}>
-              {remotePage.category_labels?.[c]
-                ? `${remotePage.category_labels[c]} · ${c}`
-                : c}
-            </option>
-          ))}
-        </Select>
-      </div>
-      {error && (
-        <p role="status" className="inline-message">
-          {error}
-        </p>
-      )}
-      <p className="small muted">配图来自上游模板库，仅作角色与服装参考。</p>
-      {loading && <p role="status">正在加载模板…</p>}
-      {loadError && (
-        <p role="alert">
-          {loadError}{" "}
-          <button onClick={() => setRefresh((r) => r + 1)}>重试</button>
-        </p>
-      )}
-      <div className="template-content">
-        <div>
-          <div className="template-grid">
-            {visible.map((t) => (
-              <button
-                key={t.id}
-                className={`template-card ${selected?.id === t.id ? "selected" : ""}`}
-                onClick={() => {
-                  setSelected(t);
-                  setEditing("");
-                }}
-              >
-                <TemplateImage key={t.id} template={t} />
-                <span className="eyebrow">
-                  {kind === "character" ? "CHARACTER" : "WARDROBE"}
-                </span>
-                <strong>{t.display?.name || t.name}</strong>
-                {t.display?.name && <span>{t.name}</span>}
-                <span>
-                  {t.categories
-                    ?.slice(0, 2)
-                    .map((c, i) => t.display?.categories[i] || c)
-                    .join(" / ") || "未分类"}
-                </span>
-                <p>
-                  {t.tags
-                    .map((tag) =>
-                      t.display?.tags[tag]
-                        ? `${t.display.tags[tag]} (${tag})`
-                        : tag,
-                    )
-                    .join(", ")}
-                </p>
-              </button>
-            ))}
-          </div>
-          {!loading && !loadError && !total && (
-            <Empty
-              title="没有找到模板"
-              text="试试其他关键词，或上传自己的模板 JSON。"
-            />
-          )}
-          <div className="pagination">
-            <span>
-              {total.toLocaleString()} 个结果 · 第 {page + 1} 页
-            </span>
-            <button
-              disabled={page === 0}
-              onClick={() => setPage((p) => p - 1)}
-              aria-label="上一页模板"
-            >
-              <ArrowLeft />
-            </button>
-            <button
-              disabled={loading || (page + 1) * 12 >= total}
-              onClick={() => setPage((p) => p + 1)}
-              aria-label="下一页模板"
-            >
-              <ArrowRight />
-            </button>
-          </div>
-        </div>
-        <aside className="template-detail">
-          {selected ? (
-            <>
-              <TemplateImage key={selected.id} template={selected} />
-              <span className="eyebrow">模板详情</span>
-              <h3>{selected.display?.name || selected.name}</h3>
-              {selected.display?.name && (
-                <p className="small muted">{selected.name}</p>
-              )}
-              <p className="small">
-                {selected.categories
-                  ?.map((c, i) =>
-                    selected.display?.categories[i]
-                      ? `${selected.display.categories[i]} (${c})`
-                      : c,
-                  )
-                  .join(" / ")}
-              </p>
-              <p className="small muted">
-                来源：{selected.source === "user" ? "个人模板" : "上游数据"}
-                <br />
-                {selected.source_revision?.slice(0, 10)}
-              </p>
-              <p className="prompt-text">
-                {selected.trigger && (
-                  <span>
-                    {selected.trigger}
-                    <br />
-                  </span>
-                )}
-                {selected.tags.map((tag, i) => (
-                  <span key={`${i}-${tag}`} className="bilingual-tag">
-                    {selected.display?.tags[tag] && (
-                      <strong>{selected.display.tags[tag]} · </strong>
-                    )}
-                    {tag}
-                    <br />
-                  </span>
-                ))}
-                {selected.description}
-              </p>
-              <button className="primary" onClick={() => onApply(selected)}>
-                使用这个模板 <ArrowRight size={16} />
-              </button>
-              {tab === "personal" && (
-                <>
-                  <button
-                    onClick={() =>
-                      setEditing(JSON.stringify(selected, null, 2))
-                    }
-                  >
-                    <PencilSimple size={16} />
-                    编辑个人模板
-                  </button>
-                  {editing && (
-                    <>
-                      <label>
-                        模板 JSON
-                        <textarea
-                          rows={10}
-                          value={editing}
-                          onChange={(e) => setEditing(e.target.value)}
-                        />
-                      </label>
-                      <button
-                        onClick={async () => {
-                          try {
-                            const [t] = parseBundle(
-                              JSON.stringify({
-                                schema_version: 1,
-                                templates: [JSON.parse(editing)],
-                              }),
-                            );
-                            if (
-                              t.id !== selected.id ||
-                              t.kind !== selected.kind
-                            )
-                              throw Error("编辑时不能修改 ID 或类型");
-                            await onEdit(t);
-                            setRefresh((r) => r + 1);
-                            setSelected(t);
-                            setEditing("");
-                            setError("个人模板已保存。");
-                          } catch (e) {
-                            setError(
-                              e instanceof SyntaxError
-                                ? "JSON 格式错误，请检查引号、逗号和括号；未保存任何内容。"
-                                : (e as Error).message,
-                            );
-                          }
-                        }}
-                      >
-                        保存修改
-                      </button>
-                    </>
-                  )}
-                </>
-              )}
-            </>
-          ) : (
-            <>
-              <BookOpen size={34} weight="light" />
-              <p>
-                选择一张模板卡片，
-                <br />
-                在这里查看完整提示词。
-              </p>
-            </>
-          )}
-        </aside>
-      </div>
     </Modal>
   );
 }

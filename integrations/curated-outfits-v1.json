@@ -1,0 +1,513 @@
+{
+  "schema_version": 2,
+  "catalog_id": "curated-outfits-v1",
+  "baseline_snapshot": {
+    "source_schema_version": 1,
+    "content_hash": "92d3e19c6bf0bc27ba15ee7dfd9fc3dc7efdf78e34e18ce9e09caf1e829fc937",
+    "status": "reconstructed_unapproved",
+    "prompt_policy": "v1-flat-tag-preview"
+  },
+  "status": "draft",
+  "character_query": "hatsune miku",
+  "character_match": "hatsune miku",
+  "preview": {
+    "role": "outfit",
+    "canvas_preset": "1024x1536",
+    "identity_tags": [
+      "hatsune miku",
+      "vocaloid",
+      "1girl",
+      "aqua eyes",
+      "aqua hair",
+      "very long hair",
+      "twintails",
+      "hair between eyes",
+      "headset",
+      "shoulder tattoo"
+    ],
+    "composition_tags": [
+      "solo",
+      "full body",
+      "standing",
+      "looking at viewer",
+      "neutral expression",
+      "simple background",
+      "grey background"
+    ],
+    "negative_tags": [
+      "nsfw",
+      "nude",
+      "underwear",
+      "lingerie",
+      "cleavage",
+      "underboob",
+      "sideboob",
+      "midriff",
+      "navel",
+      "see-through",
+      "no panties",
+      "panties",
+      "bikini",
+      "swimsuit"
+    ]
+  },
+  "ab_sample": [
+    {"recipe_id": "curated-outfit-01-classic-maid", "seed": 260901},
+    {"recipe_id": "curated-outfit-08-school-blazer", "seed": 260908},
+    {"recipe_id": "curated-outfit-13-cable-knit", "seed": 260913},
+    {"recipe_id": "curated-outfit-38-kimono", "seed": 260938},
+    {"recipe_id": "curated-outfit-46-knight", "seed": 260946}
+  ],
+  "recipes": [
+    {
+      "id": "curated-outfit-01-classic-maid",
+      "name": "经典长袖女仆装",
+      "description": "黑白配色的传统长袖女仆裙，白围裙覆盖黑色长裙，端正而不暴露。",
+      "caption_en": ["The outfit is a modest black long-sleeved maid dress layered beneath a crisp white apron.", "Restrained frills edge the dress, paired with black pantyhose and Mary Jane shoes."],
+      "category": "职业与制服",
+      "tags": ["maid", "maid apron", "black dress", "white apron", "long sleeves", "frills", "black pantyhose", "mary janes"],
+      "excluded_tags": ["maid headdress"]
+    },
+    {
+      "id": "curated-outfit-02-cafe-maid",
+      "name": "咖啡店女仆装",
+      "description": "轻快的咖啡店制服，短泡泡袖、及膝裙和腰间围裙，适合日常服务场景。",
+      "caption_en": ["The cafe uniform combines a black knee-length maid dress with short puffed sleeves and a fitted waist apron.", "A small bow tie, frilled skirt edge, knee-high socks, and Mary Jane shoes complete the outfit."],
+      "category": "职业与制服",
+      "tags": ["maid", "waist apron", "black dress", "puffy short sleeves", "frilled skirt", "bowtie", "kneehighs", "mary janes"],
+      "excluded_tags": ["maid headdress"]
+    },
+    {
+      "id": "curated-outfit-03-butler-suit",
+      "name": "执事燕尾服",
+      "description": "偏中性的正式执事装，白衬衫、黑色燕尾服、长裤与白手套。",
+      "caption_en": ["A fitted black tailcoat and matching dress trousers are layered over a clean white formal shirt.", "A neat bow tie, white gloves, and polished dress shoes finish the androgynous butler uniform."],
+      "category": "职业与制服",
+      "tags": ["butler", "tuxedo", "tailcoat", "white shirt", "bowtie", "dress pants", "white gloves", "dress shoes"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-04-waitress",
+      "name": "复古餐厅服务生",
+      "description": "复古餐厅风格的白衬衫、深色及膝裙和腰间围裙，搭配玛丽珍鞋。",
+      "caption_en": ["The vintage waitress uniform layers a practical waist apron over a dark knee-length skirt and short-sleeved white shirt.", "A compact bow tie and simple Mary Jane shoes keep the outfit tidy and restrained."],
+      "category": "职业与制服",
+      "tags": ["waitress", "white shirt", "waist apron", "skirt", "short sleeves", "bowtie", "mary janes"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-05-nurse",
+      "name": "现代护士制服",
+      "description": "整洁克制的白色护士制服，短袖连衣裙、白色长袜与低跟鞋。",
+      "caption_en": ["The modern nurse uniform is a clean white short-sleeved dress with a modest straight silhouette.", "Opaque white pantyhose and low white shoes complete the clinical outfit."],
+      "category": "职业与制服",
+      "tags": ["nurse", "nurse dress", "white dress", "short sleeves", "white pantyhose", "white shoes"],
+      "excluded_tags": ["nurse cap"]
+    },
+    {
+      "id": "curated-outfit-06-chef",
+      "name": "双排扣厨师服",
+      "description": "白色双排扣厨师上衣、深色长裤与实用围裙，整体干净利落。",
+      "caption_en": ["A structured white double-breasted chef jacket is worn with a practical apron and straight black trousers.", "Plain black work shoes complete the clean professional uniform."],
+      "category": "职业与制服",
+      "tags": ["chef", "double-breasted", "white jacket", "apron", "black pants", "black shoes"],
+      "excluded_tags": ["chef hat"]
+    },
+    {
+      "id": "curated-outfit-07-office-lady",
+      "name": "办公室套裙",
+      "description": "深色西装外套配白衬衫和铅笔裙，搭配连裤袜与低调高跟鞋。",
+      "caption_en": ["A dark tailored blazer is layered over a crisp white shirt and a fitted pencil skirt.", "Sheer pantyhose and understated high heels complete the formal office ensemble."],
+      "category": "职业与制服",
+      "tags": ["office lady", "business suit", "blazer", "white shirt", "pencil skirt", "pantyhose", "high heels"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-08-school-blazer",
+      "name": "学院西装制服",
+      "description": "学院风西装制服，包含深色 blazer、白衬衫、领带和百褶裙。",
+      "caption_en": ["The school uniform layers a dark fitted blazer over a collared white shirt and a neatly tied necktie.", "A pleated skirt, knee-high socks, and loafers form the lower half of the coordinated outfit."],
+      "category": "校园服装",
+      "tags": ["school uniform", "blazer", "collared shirt", "necktie", "pleated skirt", "kneehighs", "loafers"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-09-serafuku",
+      "name": "长袖水手服",
+      "description": "经典长袖水手服，水手领、领巾、百褶裙和及膝袜。",
+      "caption_en": ["The long-sleeved serafuku has a broad sailor collar and a neatly tied neckerchief above a pleated skirt.", "Knee-high socks and simple loafers complete the classic school uniform."],
+      "category": "校园服装",
+      "tags": ["serafuku", "sailor collar", "neckerchief", "long sleeves", "pleated skirt", "kneehighs", "loafers"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-10-tracksuit",
+      "name": "运动队服",
+      "description": "适合训练和日常活动的拉链运动外套、运动长裤与运动鞋。",
+      "caption_en": ["A zip-front track jacket and matching straight track pants form a coordinated athletic suit.", "Supportive sneakers keep the practical training outfit suitable for everyday movement."],
+      "category": "校园服装",
+      "tags": ["track suit", "track jacket", "track pants", "zipper", "sneakers"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-11-oversized-hoodie",
+      "name": "宽松连帽衫",
+      "description": "宽松长款连帽衫配修身长裤和运动鞋，舒适而有现代感。",
+      "caption_en": ["An oversized long-sleeved hoodie falls loosely over fitted leggings for a relaxed layered silhouette.", "Simple sneakers balance the roomy upper garment with a practical casual finish."],
+      "category": "日常休闲",
+      "tags": ["oversized clothes", "hoodie", "long sleeves", "leggings", "sneakers"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-12-cardigan-skirt",
+      "name": "针织开衫百褶裙",
+      "description": "柔和针织开衫叠穿翻领衬衫，配百褶裙、及膝袜和乐福鞋。",
+      "caption_en": ["A soft knitted cardigan is layered over a crisp collared shirt and a neatly pleated skirt.", "Knee-high socks and classic loafers complete the gentle preppy combination."],
+      "category": "日常休闲",
+      "tags": ["cardigan", "collared shirt", "pleated skirt", "kneehighs", "loafers"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-13-cable-knit",
+      "name": "绞花毛衣长裙",
+      "description": "厚实绞花针织毛衣搭配素色长裙与短靴，温暖安静的秋冬搭配。",
+      "caption_en": ["A thick cable-knit sweater is paired with a plain long skirt for a warm, softly structured silhouette.", "Opaque pantyhose and ankle boots complete the quiet autumn outfit."],
+      "category": "日常休闲",
+      "tags": ["cable knit", "sweater", "long skirt", "pantyhose", "ankle boots"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-14-turtleneck-pants",
+      "name": "高领毛衣长裤",
+      "description": "简洁高领针织衫配高腰长裤和乐福鞋，强调成熟利落的轮廓。",
+      "caption_en": ["A clean turtleneck sweater is tucked into tailored high-waisted trousers and secured with a narrow belt.", "Plain loafers finish the mature, streamlined outfit."],
+      "category": "日常休闲",
+      "tags": ["turtleneck sweater", "high-waist pants", "belt", "loafers"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-15-denim-casual",
+      "name": "牛仔夹克休闲装",
+      "description": "短款牛仔夹克叠穿白色上衣，下搭牛仔裤和运动鞋。",
+      "caption_en": ["A cropped denim jacket is layered over a plain white shirt and paired with straight jeans.", "Casual sneakers complete the coordinated denim outfit without extra accessories."],
+      "category": "日常休闲",
+      "tags": ["denim jacket", "white shirt", "jeans", "sneakers"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-16-overalls",
+      "name": "工装背带裤",
+      "description": "条纹长袖上衣搭配蓝色工装背带裤和帆布运动鞋。",
+      "caption_en": ["Blue work overalls are layered over a striped long-sleeved shirt with the bib and straps clearly visible.", "Canvas-style sneakers complete the practical casual outfit."],
+      "category": "日常休闲",
+      "tags": ["overalls", "striped shirt", "long sleeves", "sneakers"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-17-shirt-dress",
+      "name": "收腰衬衫裙",
+      "description": "有翻领和前排纽扣的长袖衬衫裙，以腰带收束轮廓，搭配短靴。",
+      "caption_en": ["The long-sleeved shirt dress has a crisp collar and a full row of front buttons.", "A fitted belt defines the waist, while ankle boots give the restrained dress a structured finish."],
+      "category": "日常休闲",
+      "tags": ["collared dress", "buttons", "belt", "long sleeves", "ankle boots"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-18-sundress",
+      "name": "碎花夏日连衣裙",
+      "description": "轻盈的碎花夏日连衣裙，及膝裙摆与细带凉鞋，整体清爽自然。",
+      "caption_en": ["A light floral sundress falls to the knees with an airy, uncomplicated silhouette.", "Delicate strapped sandals complete the fresh summer outfit."],
+      "category": "日常休闲",
+      "tags": ["sundress", "floral print", "dress", "sandals"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-19-maxi-cardigan",
+      "name": "开衫长连衣裙",
+      "description": "长款素色连衣裙外搭轻薄开衫和浅口鞋，适合温和日常造型。",
+      "caption_en": ["A lightweight cardigan is layered over a plain full-length dress with a soft vertical drape.", "Simple flats keep the gentle everyday outfit understated."],
+      "category": "日常休闲",
+      "tags": ["long dress", "cardigan", "long sleeves", "flats"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-20-pajamas",
+      "name": "长袖睡衣套装",
+      "description": "宽松的长袖纽扣睡衣上衣与睡裤，搭配室内拖鞋。",
+      "caption_en": ["The loose pajama set has a long-sleeved button-front top and matching relaxed pajama trousers.", "Soft indoor slippers complete the comfortable sleepwear ensemble."],
+      "category": "日常休闲",
+      "tags": ["pajamas", "long sleeves", "pajama pants", "buttons", "slippers"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-21-trench-coat",
+      "name": "经典风衣",
+      "description": "及膝双排扣风衣叠穿高领衫与格纹半裙，搭配短靴。",
+      "caption_en": ["A knee-length double-breasted trench coat is layered over a turtleneck and a plaid skirt.", "Pantyhose and ankle boots complete the structured transitional outfit."],
+      "category": "季节外套",
+      "tags": ["trench coat", "double-breasted", "turtleneck", "plaid skirt", "pantyhose", "ankle boots"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-22-duffel-coat",
+      "name": "牛角扣大衣",
+      "description": "学院感牛角扣大衣搭配围巾、百褶裙、厚袜和短靴。",
+      "caption_en": ["A collegiate duffel coat with visible toggle fastenings is layered over a pleated skirt.", "A wrapped scarf, thick knee-high socks, and sturdy boots complete the winter outfit."],
+      "category": "季节外套",
+      "tags": ["duffel coat", "toggles", "scarf", "pleated skirt", "kneehighs", "boots"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-23-puffer-jacket",
+      "name": "短款羽绒服",
+      "description": "短款羽绒夹克叠穿毛衣，下搭牛仔裤和保暖雪地靴。",
+      "caption_en": ["A cropped quilted down jacket is layered over a warm sweater and straight jeans.", "Gloves and insulated snow boots complete the practical cold-weather outfit."],
+      "category": "季节外套",
+      "tags": ["down jacket", "sweater", "jeans", "snow boots", "gloves"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-24-raincoat",
+      "name": "明黄色雨衣",
+      "description": "明黄色连帽雨衣搭配深色打底裤和橡胶雨靴。",
+      "caption_en": ["A bright yellow hooded raincoat forms a clean waterproof outer layer over dark leggings.", "Rubber rain boots complete the simple wet-weather outfit."],
+      "category": "季节外套",
+      "tags": ["yellow raincoat", "hood", "leggings", "rubber boots"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-25-peacoat",
+      "name": "海军呢大衣",
+      "description": "深蓝色双排扣海军呢大衣配围巾、及膝裙和长靴。",
+      "caption_en": ["A dark navy double-breasted peacoat is layered over a knee-length skirt with a wrapped scarf at the collar.", "Tall boots complete the compact maritime winter silhouette."],
+      "category": "季节外套",
+      "tags": ["peacoat", "double-breasted", "scarf", "skirt", "boots"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-26-techwear",
+      "name": "黑色机能风",
+      "description": "黑色机能风层叠搭配，包含多口袋背心、工装长裤、手套和战斗靴。",
+      "caption_en": ["The black techwear outfit layers a multi-pocket utility vest over a fitted base and practical cargo trousers.", "Fingerless gloves and combat boots reinforce the functional, modular silhouette."],
+      "category": "街头与机能",
+      "tags": ["techwear", "utility vest", "cargo pants", "fingerless gloves", "combat boots"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-27-bomber-streetwear",
+      "name": "飞行夹克街头装",
+      "description": "宽松飞行夹克叠穿图案 T 恤，下搭工装裤和厚底运动鞋。",
+      "caption_en": ["An oversized bomber jacket is layered over a graphic T-shirt and loose cargo trousers.", "Chunky sneakers complete the relaxed streetwear proportions."],
+      "category": "街头与机能",
+      "tags": ["bomber jacket", "print shirt", "cargo pants", "sneakers"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-28-varsity",
+      "name": "棒球夹克学院风",
+      "description": "双色棒球夹克叠穿连帽衫，搭配百褶裙和运动鞋。",
+      "caption_en": ["A two-tone letterman jacket is layered over a soft hoodie and paired with a pleated skirt.", "Casual sneakers complete the sporty collegiate combination."],
+      "category": "街头与机能",
+      "tags": ["letterman jacket", "hoodie", "pleated skirt", "sneakers"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-29-punk",
+      "name": "格纹朋克装",
+      "description": "黑色皮夹克搭配红黑格纹裙、铆钉腰带和战斗靴。",
+      "caption_en": ["A black leather jacket is paired with a red-and-black plaid skirt and a visible studded belt.", "Black pantyhose and heavy combat boots complete the restrained punk outfit."],
+      "category": "街头与机能",
+      "tags": ["punk", "leather jacket", "plaid skirt", "studded belt", "black pantyhose", "combat boots"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-30-detective",
+      "name": "复古侦探装",
+      "description": "棕色风衣内搭马甲、衬衫和领带，配格纹长裤与牛津鞋。",
+      "caption_en": ["A brown trench coat is layered over a waistcoat, collared shirt, and neatly tied necktie.", "Plaid trousers and polished Oxford shoes complete the vintage detective ensemble."],
+      "category": "街头与机能",
+      "tags": ["detective", "trench coat", "waistcoat", "collared shirt", "necktie", "plaid pants", "oxfords"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-31-classic-lolita",
+      "name": "古典洛丽塔",
+      "description": "端庄的古典洛丽塔连衣裙，长袖、高领、蕾丝镶边与及膝袜。",
+      "caption_en": ["The classical Lolita dress has a high collar, long sleeves, a structured frilled skirt, and restrained lace trim.", "Knee-high socks and Mary Jane shoes complete the balanced formal silhouette."],
+      "category": "礼服与洛丽塔",
+      "tags": ["lolita fashion", "frilled dress", "high collar", "long sleeves", "lace trim", "kneehighs", "mary janes"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-32-gothic-lolita",
+      "name": "哥特洛丽塔",
+      "description": "黑色哥特洛丽塔长袖裙，以蕾丝、褶边和黑色连裤袜构成层次。",
+      "caption_en": ["The Gothic Lolita outfit centers on a black long-sleeved dress built from layered lace and controlled frills.", "Opaque black pantyhose and Mary Jane shoes continue the dark coordinated palette."],
+      "category": "礼服与洛丽塔",
+      "tags": ["gothic lolita", "black dress", "long sleeves", "lace", "frills", "black pantyhose", "mary janes"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-33-sweet-lolita",
+      "name": "甜系洛丽塔",
+      "description": "粉白配色的甜系洛丽塔裙，泡泡短袖、荷叶边和蝴蝶结装饰。",
+      "caption_en": ["The sweet Lolita dress uses a pink-and-white palette with short puffed sleeves and a full frilled skirt.", "A neat bow, knee-high socks, and Mary Jane shoes complete the cheerful coordinated outfit."],
+      "category": "礼服与洛丽塔",
+      "tags": ["sweet lolita", "pink dress", "puffy short sleeves", "frills", "bow", "kneehighs", "mary janes"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-34-victorian",
+      "name": "维多利亚长裙",
+      "description": "高领长袖的维多利亚长裙，收束腰线并以蕾丝手套和短靴收尾。",
+      "caption_en": ["The Victorian long dress has a high collar, fitted waist, long sleeves, and a full ankle-length skirt.", "Lace gloves and ankle boots complete the period-inspired formal silhouette."],
+      "category": "礼服与洛丽塔",
+      "tags": ["victorian", "high collar", "long sleeves", "long dress", "lace gloves", "ankle boots"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-35-evening-gown",
+      "name": "宝石蓝晚礼服",
+      "description": "宝石蓝及地晚礼服，露肩领口、长手套和同色高跟鞋，保持正式而克制。",
+      "caption_en": ["A jewel-blue floor-length evening gown falls from a restrained off-shoulder neckline in a clean formal silhouette.", "Long elbow gloves and matching high heels complete the coordinated evening ensemble."],
+      "category": "礼服与洛丽塔",
+      "tags": ["evening gown", "blue dress", "off-shoulder dress", "elbow gloves", "high heels"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-36-cocktail-dress",
+      "name": "酒红鸡尾酒裙",
+      "description": "酒红色及膝鸡尾酒裙，以细腰带和黑色高跟鞋完成简洁宴会造型。",
+      "caption_en": ["A wine-red knee-length cocktail dress has a clean fitted shape defined by a narrow waist belt.", "Simple black high heels complete the restrained party outfit."],
+      "category": "礼服与洛丽塔",
+      "tags": ["cocktail dress", "red dress", "dress", "belt", "high heels"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-37-tuxedo",
+      "name": "白衬衫燕尾礼服",
+      "description": "黑色燕尾礼服搭配白衬衫、领结、修身长裤与白手套。",
+      "caption_en": ["A sharp black tailcoat and fitted dress trousers are layered over a crisp white formal shirt.", "A bow tie, white gloves, and polished dress shoes complete the formal tuxedo ensemble."],
+      "category": "礼服与洛丽塔",
+      "tags": ["tuxedo", "tailcoat", "white shirt", "bowtie", "dress pants", "white gloves", "dress shoes"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-38-kimono",
+      "name": "正式振袖和服",
+      "description": "层次完整的正式振袖和服，以宽腰带、足袋与草履组成传统搭配。",
+      "caption_en": ["The formal furisode kimono has long flowing sleeves and overlapping front layers secured by a broad structured obi.", "White tabi socks and traditional zouri sandals complete the ceremonial outfit."],
+      "category": "传统服饰",
+      "tags": ["furisode", "kimono", "obi", "long sleeves", "tabi", "zouri"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-39-yukata",
+      "name": "夏日浴衣",
+      "description": "轻薄夏日浴衣，配宽腰带和木屐，图案保持简洁清爽。",
+      "caption_en": ["The lightweight summer yukata wraps cleanly across the body and is secured by a broad obi with a restrained floral pattern.", "Traditional geta sandals complete the simple seasonal outfit."],
+      "category": "传统服饰",
+      "tags": ["yukata", "obi", "floral print", "geta"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-40-miko",
+      "name": "巫女装束",
+      "description": "白色小袖上衣、红色袴、足袋与草履组成的完整巫女装束。",
+      "caption_en": ["The shrine maiden outfit layers a white wide-sleeved kosode above full red hakama trousers.", "White tabi socks and traditional zouri sandals complete the ceremonial combination."],
+      "category": "传统服饰",
+      "tags": ["miko", "white kosode", "red hakama", "wide sleeves", "tabi", "zouri"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-41-hanfu",
+      "name": "层叠汉服",
+      "description": "宽袖上衣、系带与长裙构成的层叠汉服，线条柔和流畅。",
+      "caption_en": ["The layered hanfu combines a wide-sleeved upper robe with overlapping panels and a long flowing skirt.", "A broad sash secures the layers while preserving the soft vertical drape."],
+      "category": "传统服饰",
+      "tags": ["hanfu", "wide sleeves", "sash", "long skirt", "layered clothes"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-42-qipao",
+      "name": "端庄旗袍",
+      "description": "高领短袖的深色旗袍，保留传统盘扣和克制侧开衩，搭配低跟鞋。",
+      "caption_en": ["The dark qipao has a high collar, short sleeves, a fitted long line, and traditional knotted closures.", "A restrained side slit and low block heels keep the formal dress modest and balanced."],
+      "category": "传统服饰",
+      "tags": ["china dress", "high collar", "short sleeves", "side slit", "low block heels"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-43-witch",
+      "name": "学院派女巫装",
+      "description": "深色长袖女巫裙、短披肩、尖顶帽和系带短靴，整体偏学院奇幻。",
+      "caption_en": ["A dark long-sleeved witch dress is layered beneath a short capelet with a compact pointed hat above.", "Lace-up ankle boots complete the academic fantasy outfit."],
+      "category": "幻想与冒险",
+      "tags": ["witch", "witch hat", "black dress", "capelet", "long sleeves", "ankle boots"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-44-mage",
+      "name": "旅行法师袍",
+      "description": "便于行动的分层法师袍，带兜帽短斗篷、腰包、手套和长靴。",
+      "caption_en": ["A practical layered mage robe is covered by a short hooded cape and secured at the waist with a belt pouch.", "Gloves and sturdy boots complete the travel-ready fantasy outfit."],
+      "category": "幻想与冒险",
+      "tags": ["robe", "hooded cape", "belt pouch", "gloves", "boots"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-45-archer",
+      "name": "轻甲弓手装",
+      "description": "皮革轻甲叠穿短上衣，配护臂、肩甲、长靴和箭袋。",
+      "caption_en": ["Light leather armor is layered over a fitted tunic with shoulder guards and protective forearm bracers.", "Thigh-high boots and a visible quiver complete the mobile archer outfit."],
+      "category": "幻想与冒险",
+      "tags": ["archery", "leather armor", "tunic", "shoulder armor", "bracer", "thigh boots", "quiver"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-46-knight",
+      "name": "银色骑士甲",
+      "description": "完整但不过度笨重的银色板甲，包含护手、胫甲、铁靴与披风。",
+      "caption_en": ["Fitted silver plate armor forms a complete but mobile armored dress with articulated gauntlets and greaves.", "Metal sabatons and a plain cape complete the balanced knight ensemble."],
+      "category": "幻想与冒险",
+      "tags": ["knight", "plate armor", "armored dress", "gauntlets", "greaves", "sabaton", "cape"],
+      "excluded_tags": ["helmet"]
+    },
+    {
+      "id": "curated-outfit-47-adventurer",
+      "name": "轻装冒险者",
+      "description": "实用的旅行短上衣、皮背心、腰带、打底裤和及膝靴。",
+      "caption_en": ["A practical travel tunic is layered beneath a fitted leather vest and secured with a utility belt.", "Leggings, fingerless gloves, and knee-high boots complete the lightweight adventurer outfit."],
+      "category": "幻想与冒险",
+      "tags": ["tunic", "leather vest", "belt", "leggings", "knee boots", "fingerless gloves"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-48-steampunk",
+      "name": "蒸汽朋克旅行装",
+      "description": "维多利亚式衬衫叠穿棕色马甲和长裙，以齿轮饰件、手套和系带靴点缀。",
+      "caption_en": ["A Victorian-style blouse is layered beneath a brown waistcoat and paired with a full long skirt.", "Small gear ornaments, gloves, lace-up boots, and practical goggles complete the steampunk travel outfit."],
+      "category": "幻想与冒险",
+      "tags": ["steampunk", "victorian", "brown vest", "long skirt", "gears", "gloves", "lace-up boots", "goggles"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-49-idol",
+      "name": "蓝白偶像舞台装",
+      "description": "蓝白配色的偶像舞台服，泡泡袖、荷叶短裙、蝴蝶结和短靴构成清晰轮廓。",
+      "caption_en": ["The blue-and-white idol costume combines puffed sleeves with a layered frilled skirt and a prominent coordinated bow.", "Thigh-high socks and ankle boots complete the crisp stage silhouette."],
+      "category": "舞台与表演",
+      "tags": ["idol clothes", "puffy sleeves", "frilled skirt", "bow", "thighhighs", "ankle boots"],
+      "excluded_tags": []
+    },
+    {
+      "id": "curated-outfit-50-ballet",
+      "name": "古典芭蕾舞裙",
+      "description": "端庄的古典芭蕾造型，硬纱短裙、连体舞衣、浅色连裤袜和芭蕾舞鞋。",
+      "caption_en": ["A fitted ballet leotard supports a structured classical tutu with clean, even layers.", "Light opaque pantyhose and ballet slippers complete the restrained dance costume."],
+      "category": "舞台与表演",
+      "tags": ["ballet", "tutu", "leotard", "pantyhose", "ballet slippers"],
+      "excluded_tags": []
+    }
+  ]
+}

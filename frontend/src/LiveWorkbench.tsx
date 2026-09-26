@@ -1,21 +1,25 @@
+import { useWorkbenchPreferences } from "./workbenchPreferences";
+import { readPreference, writePreference } from "./storage";
+import { useStepNavigation } from "./useStepNavigation";
 import canvasPresets from "../../integrations/canvas-presets.json";
-import {
-  expressionPresets as moods,
-  expressionLabel,
-  assetTypeLabel,
-  jobErrorLabel,
-} from "./presentation";
+import { expressionLabel, assetTypeLabel, jobErrorLabel } from "./presentation";
 import { Select } from "./Select";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import {
   ArrowRight,
   Clock,
   X,
   SlidersHorizontal,
+  Sparkle,
   Plus,
   DownloadSimple,
 } from "@phosphor-icons/react";
-import { Modal, TemplateDrawer } from "./App";
+import { Modal } from "./components/Modal";
+import { TemplateDrawer } from "./components/TemplateDrawer";
+const AgentPanel = lazy(() =>
+  import("./AgentPanel").then(({ AgentPanel }) => ({ default: AgentPanel })),
+);
+import type { AgentWorkbenchContext } from "./agent";
 import { serverLibrary, type ServerCharacter } from "./library";
 import { type Template, steps } from "./model";
 import {
@@ -30,11 +34,12 @@ import {
   type ProductionBatchRequest,
   type ProductionBatch,
   type ProductionPreset,
+  type PromptSettings,
+  type PromptSettingsInput,
 } from "./production";
 import "./live.css";
 
 const FORM_KEY = "caster-live-character-draft-v1";
-const ACTIVE_KEY = "caster-live-active-v1";
 const newCharacter = (): ServerCharacter => ({
   id: crypto.randomUUID(),
   name: "",
@@ -44,9 +49,15 @@ const newCharacter = (): ServerCharacter => ({
 });
 function readDraft(): ServerCharacter {
   try {
-    return (
-      JSON.parse(localStorage.getItem(FORM_KEY) || "null") || newCharacter()
-    );
+    const value = JSON.parse(readPreference(FORM_KEY) || "null");
+    return value &&
+      typeof value.id === "string" &&
+      typeof value.name === "string" &&
+      Array.isArray(value.fixed_tags) &&
+      value.fixed_tags.every((tag: unknown) => typeof tag === "string") &&
+      Array.isArray(value.outfits)
+      ? value
+      : newCharacter();
   } catch {
     return newCharacter();
   }
@@ -72,45 +83,89 @@ function readIntent(id: string): ProductionBatchRequest | null {
 
 export function LiveWorkbench() {
   const [characters, setCharacters] = useState<ServerCharacter[]>([]);
-  const [active, setActive] = useState(
-    () => localStorage.getItem(ACTIVE_KEY) || "",
-  );
+  const {
+    active,
+    setActive,
+    step,
+    setStep,
+    outfitIds,
+    setOutfitIds,
+    poseIds,
+    setPoseIds,
+    expressions,
+    setExpressions,
+    chosenMoods,
+    setChosenMoods,
+  } = useWorkbenchPreferences();
   const [draft, setDraft] = useState(readDraft);
-  const [step, setStep] = useState(0);
   const [canvasPreset, setCanvasPreset] = useState(() => {
-    const saved=localStorage.getItem("caster-canvas-preset");
-    return canvasPresets.some(p=>p.id===saved) ? saved! : "1024x1536";
+    const saved = readPreference("caster-canvas-preset");
+    return canvasPresets.some((p) => p.id === saved) ? saved! : "1024x1536";
   });
-  useEffect(()=>localStorage.setItem("caster-canvas-preset",canvasPreset),[canvasPreset]);
+  useEffect(
+    () => writePreference("caster-canvas-preset", canvasPreset),
+    [canvasPreset],
+  );
   const [characterFormOpen, setCharacterFormOpen] = useState(false);
-  const skipPreferencesSave = useRef(true);
-  const stepsNav = useRef<HTMLElement>(null);
-  useEffect(() => {
-    const nav = stepsNav.current;
-    if (!nav) return;
-    const reveal = () => {
-      const item = nav.querySelector<HTMLElement>('[aria-current="step"]');
-      if (!item || nav.scrollWidth <= nav.clientWidth) return;
-      const a = item.getBoundingClientRect(),
-        b = nav.getBoundingClientRect();
-      nav.scrollLeft += a.left - b.left - (nav.clientWidth - a.width) / 2;
-    };
-    reveal();
-    const resize = new ResizeObserver(reveal);
-    resize.observe(nav);
-    return () => resize.disconnect();
-  }, [step]);
+  const stepsNav = useStepNavigation(step);
   const [snapshot, setSnapshot] = useState<ProductionSnapshot | null>(null);
   const catalog: Template[] = [];
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
+  const viewVersion = useRef(0);
+  const viewActive = useRef(active);
+  if (viewActive.current !== active) {
+    viewActive.current = active;
+    viewVersion.current += 1;
+  }
+  useEffect(
+    () => () => {
+      viewVersion.current += 1;
+    },
+    [],
+  );
   const [revision, setRevision] = useState(0);
   const [connected, setConnected] = useState(false);
   const [online, setOnline] = useState(false);
   const [drawer, setDrawer] = useState<"character" | "outfit" | null>(null);
+  function openTemplateDrawer(kind: "character" | "outfit") {
+    setDrawer(kind);
+  }
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [promptSettings, setPromptSettings] = useState<PromptSettings | null>(
+    null,
+  );
+  const [promptDraft, setPromptDraft] = useState<PromptSettingsInput | null>(
+    null,
+  );
+  const [promptSettingsBusy, setPromptSettingsBusy] = useState(false);
+  const [promptSettingsMessage, setPromptSettingsMessage] = useState("");
+  useEffect(() => {
+    let live = true;
+    const controller = new AbortController();
+    productionAPI
+      .promptSettings(controller.signal)
+      .then((value) => {
+        if (!live) return;
+        setPromptSettings(value);
+        setPromptDraft({
+          artist_style: value.artist_style,
+          fixed_positive: value.fixed_positive,
+          fixed_negative: value.fixed_negative,
+        });
+      })
+      .catch((reason) => {
+        if (live) setPromptSettingsMessage((reason as Error).message);
+      });
+    return () => {
+      live = false;
+      controller.abort();
+    };
+  }, []);
   const [tasksOpen, setTasksOpen] = useState(false);
+  const [agentOpen, setAgentOpen] = useState(false);
   const [wideScreen, setWideScreen] = useState(
     () => window.matchMedia("(min-width: 1100px)").matches,
   );
@@ -126,14 +181,8 @@ export function LiveWorkbench() {
     tags: string;
     parent_id?: string;
   } | null>(null);
-  const [outfitIds, setOutfitIds] = useState<string[]>([]);
   const [presets, setPresets] = useState<ProductionPreset[]>([]);
   const [presetError, setPresetError] = useState("");
-  const [poseIds, setPoseIds] = useState<string[]>([]);
-  const [expressions, setExpressions] = useState(moods);
-  const [chosenMoods, setChosenMoods] = useState(
-    moods.slice(0, 3).map((m) => m.prompt),
-  );
   const [customMood, setCustomMood] = useState("");
   const [lightbox, setLightbox] = useState<ProductionAsset | null>(null);
   const [pending, setPending] = useState<ProductionBatchRequest | null>(() =>
@@ -154,6 +203,24 @@ export function LiveWorkbench() {
   const selection =
     data?.selections?.find((s) => s.character_id === active) ||
     emptySelection(active);
+  const agentContext: AgentWorkbenchContext = {
+    character_id: active || null,
+    character_name: character?.name || "",
+    stage: (["none", "identity", "outfit", "pose", "expression", "export"][
+      step
+    ] || "none") as AgentWorkbenchContext["stage"],
+    selected_asset_ids: {
+      identity: selection.identity_asset_id,
+      outfit: selection.outfit_asset_id,
+      pose: selection.pose_asset_id,
+    },
+    selected_outfit_id: selection.outfit_id,
+    selection_revision: selection.revision,
+    uncommitted_draft: null,
+    candidate_set_id: null,
+    canvas_preset: canvasPreset,
+    known_character_ids: characters.map((item) => item.id),
+  };
   const assets = data?.assets || [];
   const selectedImage = (id: string | null) => assets.find((a) => a.id === id);
   const outfitName = (id?: string) =>
@@ -178,62 +245,44 @@ export function LiveWorkbench() {
       window.scrollTo({ top: 0 });
     }
   }
+  async function applyAgentWorkbenchChange(
+    characterId: string,
+    focus: "identity" | "outfit" | "pose" | "expression",
+  ) {
+    const version = viewVersion.current;
+    try {
+      const rows = await serverLibrary.characters();
+      if (viewVersion.current !== version || busyRef.current) return;
+      setCharacters(rows);
+      const requestedStep = { identity: 1, outfit: 2, pose: 3, expression: 4 }[
+        focus
+      ];
+      setActive(characterId, requestedStep);
+      setRevision((value) => value + 1);
+      setNotice(
+        focus === "identity"
+          ? "已切换到新角色，下一步是确认身份图。"
+          : "Agent 已更新分步工作台。",
+      );
+    } catch (nextError) {
+      if (viewVersion.current === version)
+        setNotice((nextError as Error).message);
+    }
+  }
   useEffect(() => {
-    localStorage.setItem(FORM_KEY, JSON.stringify(draft));
+    writePreference(FORM_KEY, JSON.stringify(draft));
   }, [draft]);
   useEffect(() => {
-    localStorage.setItem(ACTIVE_KEY, active);
     setPending(readIntent(active));
-    skipPreferencesSave.current = true;
-    try {
-      const saved = JSON.parse(
-        localStorage.getItem(`caster-live-options-${active}`) || "null",
-      );
-      if (saved) {
-        if (Number.isInteger(saved.step) && saved.step >= 0 && saved.step <= 5)
-          setStep(saved.step);
-        setOutfitIds(Array.isArray(saved.outfitIds) ? saved.outfitIds : []);
-        setPoseIds(
-          Array.isArray(saved.poseIds)
-            ? saved.poseIds.filter((id: string) =>
-                /^preset:1[0-9]{2}$/.test(id),
-              )
-            : [],
-        );
-        setExpressions([
-          ...moods,
-          ...(Array.isArray(saved.expressions) ? saved.expressions : []).filter(
-            (item: { prompt: string }) =>
-              !moods.some((m) => m.prompt === item.prompt),
-          ),
-        ]);
-        if (Array.isArray(saved.chosenMoods)) setChosenMoods(saved.chosenMoods);
-      } else {
-        setExpressions(moods);
-        setChosenMoods(moods.slice(0, 3).map((m) => m.prompt));
-        setOutfitIds([]);
-        setPoseIds([]);
-      }
-    } catch {
-      setOutfitIds([]);
-      setPoseIds([]);
-    }
+    setLightbox(null);
+    setOutfitForm(null);
+    setCorrection(null);
   }, [active]);
   useEffect(() => {
-    if (skipPreferencesSave.current) {
-      skipPreferencesSave.current = false;
-      return;
-    }
-    if (active)
-      localStorage.setItem(
-        `caster-live-options-${active}`,
-        JSON.stringify({ step, outfitIds, poseIds, expressions, chosenMoods }),
-      );
-  }, [active, step, outfitIds, poseIds, expressions, chosenMoods]);
-  useEffect(() => {
     let live = true;
+    const controller = new AbortController();
     serverLibrary
-      .characters()
+      .characters(controller.signal)
       .then((rows) => {
         if (!live) return;
         setCharacters(rows);
@@ -244,6 +293,7 @@ export function LiveWorkbench() {
       .catch((e) => live && setError(e.message));
     return () => {
       live = false;
+      controller.abort();
     };
   }, []);
   useEffect(() => {
@@ -255,7 +305,7 @@ export function LiveWorkbench() {
     async function load() {
       try {
         const [cap, snap] = await Promise.all([
-          productionAPI.capabilities(),
+          productionAPI.capabilities(controller.signal),
           active
             ? productionAPI.snapshot(active, controller.signal)
             : Promise.resolve(null),
@@ -263,8 +313,8 @@ export function LiveWorkbench() {
         if (!live) return;
         setConnected(Boolean(cap.selection && cap.batches));
         setOnline(cap.generation_online);
-        productionAPI
-          .presets()
+        await productionAPI
+          .presets(controller.signal)
           .then((rows) => {
             if (live) {
               const studio = rows.filter((p) => p.format === "pose_studio_3d");
@@ -282,6 +332,7 @@ export function LiveWorkbench() {
           .catch(() => {
             if (live) setPresetError("姿态库连接失败，正在重新连接。");
           });
+        if (!live) return;
         setSnapshot(snap);
         setError("");
         if (snap)
@@ -306,19 +357,23 @@ export function LiveWorkbench() {
   }, [active, revision]);
   useEffect(() => {
     if (data && !canStep(step)) setStep(character ? 1 : 0);
-  }, [selection.revision, active]);
-  async function act(action: () => Promise<void>) {
-    if (busy) return false;
+  }, [selection.revision, active, data, step, !!character]);
+  async function act(action: (current: () => boolean) => Promise<void>) {
+    if (busyRef.current) return false;
+    busyRef.current = true;
+    const version = viewVersion.current;
+    const current = () => viewVersion.current === version;
     setBusy(true);
     setNotice("");
     try {
-      await action();
-      setRevision((v) => v + 1);
+      await action(current);
+      if (current()) setRevision((v) => v + 1);
       return true;
     } catch (e) {
-      setNotice((e as Error).message);
+      if (current()) setNotice((e as Error).message);
       return false;
     } finally {
+      busyRef.current = false;
       setBusy(false);
     }
   }
@@ -333,8 +388,9 @@ export function LiveWorkbench() {
     asset: ProductionAsset,
     stage: "identity" | "outfit" | "pose",
   ) {
-    await act(async () => {
+    await act(async (current) => {
       await productionAPI.select(active, selection, stage, asset.id, true);
+      if (!current()) return;
       setNotice("已选定图片。");
       setLightbox(null);
     });
@@ -364,12 +420,12 @@ export function LiveWorkbench() {
               }));
     const intent: ProductionBatchRequest = request || {
       role,
-      ...(role === "identity" ? {canvas_preset: canvasPreset} : {}),
+      ...(role === "identity" ? { canvas_preset: canvasPreset } : {}),
       candidates,
       expected_revision: selection.revision,
       idempotency_key: crypto.randomUUID(),
     };
-    return act(async () => {
+    return act(async (current) => {
       // The transparency button is the user's explicit choice of source image.
       // Keep that selection inside the same busy section as submission.
       if (intent.role === "matte") {
@@ -397,16 +453,17 @@ export function LiveWorkbench() {
           }
       }
       localStorage.setItem(intentKey(active), JSON.stringify(intent));
-      setPending(intent);
+      if (current()) setPending(intent);
       try {
         const batch = await productionAPI.submitBatch(active, intent);
         localStorage.removeItem(intentKey(active));
+        if (!current()) return;
         setPending(null);
         setNotice(`已提交 ${batch.job_ids.length} 项任务。`);
       } catch (e) {
         if (e instanceof ProductionError && e.status && e.status < 500) {
           localStorage.removeItem(intentKey(active));
-          setPending(null);
+          if (current()) setPending(null);
         }
         throw e;
       }
@@ -541,22 +598,50 @@ export function LiveWorkbench() {
                   ? "添加表情"
                   : "整理资产"}
       </h2>
-      {step >= 2 && step <= 4 && (() => {
-        const image=selectedImage(step===2 ? selection.identity_asset_id : step===3 ? selection.outfit_asset_id : selection.pose_asset_id);
-        return image?.width && image.height ? <p className="muted">沿用画布：{image.width} × {image.height}</p> : null;
-      })()}
+      {step >= 2 &&
+        step <= 4 &&
+        (() => {
+          const image = selectedImage(
+            step === 2
+              ? selection.identity_asset_id
+              : step === 3
+                ? selection.outfit_asset_id
+                : selection.pose_asset_id,
+          );
+          return image?.width && image.height ? (
+            <p className="muted">
+              沿用画布：{image.width} × {image.height}
+            </p>
+          ) : null;
+        })()}
       {step === 0 ? (
         <>
           <p>选择已有角色，或从模板建立新角色。</p>
-          <button onClick={() => setDrawer("character")}>浏览角色模板</button>
+          <button onClick={() => openTemplateDrawer("character")}>
+            浏览角色模板
+          </button>
         </>
       ) : step === 1 ? (
         <>
           <p>基础服装用于确认模样。每次生成三张，选一张继续。</p>
-          <label>画布尺寸<Select aria-label="画布尺寸" value={canvasPreset} onValueChange={setCanvasPreset} disabled={busy || !!pending}>
-            {canvasPresets.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}
-          </Select></label>
-          <p className="muted">选定图片后，换装、姿态与表情沿用它的尺寸。较大尺寸需要更多显存与时间。</p>
+          <label>
+            画布尺寸
+            <Select
+              aria-label="画布尺寸"
+              value={canvasPreset}
+              onValueChange={setCanvasPreset}
+              disabled={busy || !!pending}
+            >
+              {canvasPresets.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.label}
+                </option>
+              ))}
+            </Select>
+          </label>
+          <p className="muted">
+            选定图片后，换装、姿态与表情沿用它的尺寸。较大尺寸需要更多显存与时间。
+          </p>
         </>
       ) : step === 2 ? (
         <>
@@ -573,7 +658,7 @@ export function LiveWorkbench() {
               </label>
             ))}
           </div>
-          <button onClick={() => setDrawer("outfit")}>
+          <button onClick={() => openTemplateDrawer("outfit")}>
             <Plus size={16} />
             添加服装方案
           </button>
@@ -701,6 +786,97 @@ export function LiveWorkbench() {
           </label>
         </>
       )}
+      <details className="optional-settings prompt-runtime-settings">
+        <summary>Anima 提示词设置</summary>
+        <div className="disclosure-content">
+          <p className="small muted">
+            这些是运行时偏好，不写入角色或服装模板。拼接顺序固定为：质量/元数据
+            → 人数 → 角色 → 作品 → 画师风格 → 服装与构图 → 自然语言。
+          </p>
+          {promptDraft ? (
+            <>
+              <label>
+                画师风格
+                <input
+                  value={promptDraft.artist_style}
+                  placeholder="例如 @rella；多个用逗号分隔"
+                  onChange={(event) =>
+                    setPromptDraft({
+                      ...promptDraft,
+                      artist_style: event.target.value,
+                    })
+                  }
+                />
+              </label>
+              <label>
+                固定正面提示词
+                <textarea
+                  rows={4}
+                  value={promptDraft.fixed_positive}
+                  placeholder="质量、元数据、年份、安全标签"
+                  onChange={(event) =>
+                    setPromptDraft({
+                      ...promptDraft,
+                      fixed_positive: event.target.value,
+                    })
+                  }
+                />
+              </label>
+              <label>
+                固定负面提示词
+                <textarea
+                  rows={6}
+                  value={promptDraft.fixed_negative}
+                  onChange={(event) =>
+                    setPromptDraft({
+                      ...promptDraft,
+                      fixed_negative: event.target.value,
+                    })
+                  }
+                />
+              </label>
+              <button
+                className="primary"
+                disabled={promptSettingsBusy}
+                onClick={async () => {
+                  setPromptSettingsBusy(true);
+                  setPromptSettingsMessage("");
+                  try {
+                    const saved =
+                      await productionAPI.savePromptSettings(promptDraft);
+                    setPromptSettings(saved);
+                    setPromptDraft({
+                      artist_style: saved.artist_style,
+                      fixed_positive: saved.fixed_positive,
+                      fixed_negative: saved.fixed_negative,
+                    });
+                    setPromptSettingsMessage(
+                      "提示词设置已保存；尚未执行的 catalog 审批需要按新设置重新核对。",
+                    );
+                  } catch (reason) {
+                    setPromptSettingsMessage((reason as Error).message);
+                  } finally {
+                    setPromptSettingsBusy(false);
+                  }
+                }}
+              >
+                {promptSettingsBusy ? "正在保存…" : "保存提示词设置"}
+              </button>
+              <p className="small muted">
+                当前版本：
+                {promptSettings?.content_hash.slice(0, 10) || "未载入"}
+              </p>
+            </>
+          ) : (
+            <p className="small muted">正在载入提示词设置…</p>
+          )}
+          {promptSettingsMessage && (
+            <p className="inline-message" role="status">
+              {promptSettingsMessage}
+            </p>
+          )}
+        </div>
+      </details>
       {source && step >= 2 && step <= 4 && (
         <div className="selected-parent">
           <strong>本次使用的图片</strong>
@@ -829,7 +1005,7 @@ export function LiveWorkbench() {
                       <button
                         disabled={busy}
                         onClick={() =>
-                          void act(async () => {
+                          void act(async (current) => {
                             await productionAPI.cancelQueued(j);
                           })
                         }
@@ -909,7 +1085,6 @@ export function LiveWorkbench() {
           value={active}
           onValueChange={(value) => {
             setActive(value);
-            setStep(0);
           }}
         >
           <option value="">选择角色</option>
@@ -919,7 +1094,22 @@ export function LiveWorkbench() {
             </option>
           ))}
         </Select>
-        <button onClick={() => setTasksOpen(true)}>
+        <button
+          className={agentOpen ? "selected" : ""}
+          onClick={() => {
+            setTasksOpen(false);
+            setAgentOpen(true);
+          }}
+        >
+          <Sparkle size={18} weight="fill" />
+          创作助手
+        </button>
+        <button
+          onClick={() => {
+            setAgentOpen(false);
+            setTasksOpen(true);
+          }}
+        >
           <Clock size={18} />
           制作记录{activeJobs.length ? ` · ${activeJobs.length}` : ""}
         </button>
@@ -954,10 +1144,30 @@ export function LiveWorkbench() {
           <SlidersHorizontal size={18} />
           编辑设定
         </button>
-        <button onClick={() => setTasksOpen(true)}>制作记录</button>
+        <button
+          onClick={() => {
+            setAgentOpen(false);
+            setTasksOpen(true);
+          }}
+        >
+          制作记录
+        </button>
+        <button
+          onClick={() => {
+            setTasksOpen(false);
+            setAgentOpen(true);
+          }}
+        >
+          <Sparkle size={18} weight="fill" />
+          创作助手
+        </button>
       </div>
       <div
-        className={`live-layout ${tasksOpen && wideScreen ? "with-tasks" : ""}`}
+        className={
+          "live-layout " +
+          (tasksOpen && wideScreen ? "with-tasks " : "") +
+          (agentOpen && wideScreen ? "with-agent" : "")
+        }
       >
         <aside className="settings desktop-settings">{settings}</aside>
         <main>
@@ -982,6 +1192,7 @@ export function LiveWorkbench() {
                     <button
                       key={c.id}
                       className={active === c.id ? "selected-candidate" : ""}
+                      disabled={busy}
                       onClick={() => setActive(c.id)}
                     >
                       <strong>{c.name}</strong>
@@ -997,7 +1208,7 @@ export function LiveWorkbench() {
                 >
                   <summary>创建新角色</summary>
                   <div className="disclosure-content">
-                    <button onClick={() => setDrawer("character")}>
+                    <button onClick={() => openTemplateDrawer("character")}>
                       从模板填写
                     </button>
                     <label>
@@ -1025,7 +1236,7 @@ export function LiveWorkbench() {
                       className="primary"
                       disabled={busy || !connected || !draft.name.trim()}
                       onClick={() =>
-                        void act(async () => {
+                        void act(async (current) => {
                           let saved: ServerCharacter;
                           try {
                             saved = await productionAPI.createCharacter({
@@ -1061,13 +1272,13 @@ export function LiveWorkbench() {
                               );
                             saved = found;
                           }
+                          if (!current()) return;
                           setCharacters((rows) => [
                             ...rows.filter((c) => c.id !== saved.id),
                             saved,
                           ]);
-                          setActive(saved.id);
+                          setActive(saved.id, 1);
                           setDraft(newCharacter());
-                          setStep(1);
                         })
                       }
                     >
@@ -1079,7 +1290,7 @@ export function LiveWorkbench() {
                         <button
                           disabled={busy || !draft.name.trim()}
                           onClick={() =>
-                            void act(async () => {
+                            void act(async (current) => {
                               await serverLibrary.import([
                                 {
                                   id: crypto.randomUUID(),
@@ -1092,7 +1303,7 @@ export function LiveWorkbench() {
                                   source: "user",
                                 },
                               ]);
-                              // The drawer revalidates its current page after a template write.
+                              if (!current()) return;
                               setNotice("已保存到我的模板。");
                             })
                           }
@@ -1301,6 +1512,19 @@ export function LiveWorkbench() {
             </div>
           </footer>
         </main>
+        {agentOpen && wideScreen && (
+          <aside className="agent-sidebar">
+            <Suspense fallback={<p role="status">正在加载助手…</p>}>
+              <AgentPanel
+                context={agentContext}
+                onClose={() => setAgentOpen(false)}
+                onWorkbenchChange={(characterId, focus) =>
+                  void applyAgentWorkbenchChange(characterId, focus)
+                }
+              />
+            </Suspense>
+          </aside>
+        )}
         {tasksOpen && wideScreen && (
           <aside className="live-task-sidebar">
             <button className="text-button" onClick={() => setTasksOpen(false)}>
@@ -1334,6 +1558,19 @@ export function LiveWorkbench() {
           {tasks}
         </Modal>
       )}
+      {agentOpen && !wideScreen && (
+        <Modal title="创作助手" wide onClose={() => setAgentOpen(false)}>
+          <Suspense fallback={<p role="status">正在加载助手…</p>}>
+            <AgentPanel
+              context={agentContext}
+              showHeader={false}
+              onWorkbenchChange={(characterId, focus) =>
+                void applyAgentWorkbenchChange(characterId, focus)
+              }
+            />
+          </Suspense>
+        </Modal>
+      )}
       {settingsOpen && (
         <Modal title="编辑设定" onClose={() => setSettingsOpen(false)}>
           <div className="settings">{settings}</div>
@@ -1346,7 +1583,9 @@ export function LiveWorkbench() {
           catalog={catalog.filter((t) => t.source !== "user")}
           personal={catalog.filter((t) => t.source === "user")}
           status="服务器模板库"
-          onClose={() => setDrawer(null)}
+          onClose={() => {
+            setDrawer(null);
+          }}
           onApply={(t) => {
             if (drawer === "character") {
               setDraft({
@@ -1406,7 +1645,7 @@ export function LiveWorkbench() {
             className="primary"
             disabled={busy || !outfitForm.name.trim()}
             onClick={() =>
-              void act(async () => {
+              void act(async (current) => {
                 await productionAPI.createOutfit(active, {
                   ...outfitForm,
                   tags: outfitForm.tags
@@ -1414,6 +1653,7 @@ export function LiveWorkbench() {
                     .map((t) => t.trim())
                     .filter(Boolean),
                 });
+                if (!current()) return;
                 setOutfitIds((ids) => [...ids, outfitForm.id]);
                 setOutfitForm(null);
               })
@@ -1427,7 +1667,7 @@ export function LiveWorkbench() {
               <button
                 disabled={busy || !outfitForm.name.trim()}
                 onClick={() =>
-                  void act(async () => {
+                  void act(async (current) => {
                     await serverLibrary.import([
                       {
                         id: crypto.randomUUID(),
@@ -1440,7 +1680,7 @@ export function LiveWorkbench() {
                         source: "user",
                       },
                     ]);
-                    // The drawer revalidates its current page after a template write.
+                    if (!current()) return;
                     setNotice("已保存到我的模板。");
                   })
                 }

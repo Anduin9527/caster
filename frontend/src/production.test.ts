@@ -110,3 +110,41 @@ test("native pose requests carry the selected source resolution", async () => {
   await api.savePreset(105,768,1152);
   assert.equal(called,"/api/production/pose-presets/105?width=768&height=1152");
 });
+
+test("prompt preferences use a dedicated read/write settings endpoint", async () => {
+  const calls: { url: string; method?: string; body?: unknown }[] = [];
+  const value = {
+    schema_version: 1 as const,
+    artist_style: "@rella",
+    fixed_positive: "masterpiece, safe",
+    fixed_negative: "worst quality",
+    content_hash: "a".repeat(64),
+    source: "saved" as const,
+  };
+  const api = createProductionAPI((async (url, init) => {
+    calls.push({
+      url: String(url), method: init?.method,
+      body: init?.body ? JSON.parse(String(init.body)) : undefined,
+    });
+    return Response.json(value);
+  }) as typeof fetch);
+
+  await api.promptSettings();
+  await api.savePromptSettings({
+    artist_style: value.artist_style,
+    fixed_positive: value.fixed_positive,
+    fixed_negative: value.fixed_negative,
+  });
+
+  assert.deepEqual(calls, [
+    { url: "/api/prompt-settings", method: undefined, body: undefined },
+    {
+      url: "/api/prompt-settings", method: "PUT",
+      body: {
+        artist_style: "@rella",
+        fixed_positive: "masterpiece, safe",
+        fixed_negative: "worst quality",
+      },
+    },
+  ]);
+});

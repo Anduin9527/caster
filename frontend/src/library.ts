@@ -10,6 +10,7 @@ export type ServerCharacter = {
 
 // Template catalog access is independent of production task polling.
 export function createLibrary(fetcher: typeof fetch = fetch) {
+  let revision = 0;
   const pages = new Map<
     string,
     {
@@ -25,7 +26,9 @@ export function createLibrary(fetcher: typeof fetch = fetch) {
   async function request(path: string, init?: RequestInit) {
     const r = await fetcher(`/api${path}`, {
       ...init,
-      signal: AbortSignal.timeout(60000),
+      signal: init?.signal
+        ? AbortSignal.any([init.signal, AbortSignal.timeout(60000)])
+        : AbortSignal.timeout(60000),
     });
     if (!r.ok) {
       let detail = "";
@@ -38,17 +41,24 @@ export function createLibrary(fetcher: typeof fetch = fetch) {
         `后端请求失败（${r.status}）${detail}。请检查 SSH 隧道与服务。`,
       );
     }
-    if (init?.method && init.method !== "GET") pages.clear();
+    if (init?.method && init.method !== "GET") {
+      revision += 1;
+      pages.clear();
+    }
     return r.json();
   }
   return {
-    async page(query: {
-      kind: string;
-      source: string;
-      q: string;
-      category: string;
-      offset: number;
-    }) {
+    async page(
+      query: {
+        kind: string;
+        source: string;
+        q: string;
+        category: string;
+        offset: number;
+      },
+      signal?: AbortSignal,
+    ) {
+      signal?.throwIfAborted();
       const params = new URLSearchParams({
         ...query,
         offset: String(query.offset),
@@ -57,7 +67,8 @@ export function createLibrary(fetcher: typeof fetch = fetch) {
       const key = params.toString();
       const cached = pages.get(key);
       if (cached && cached.expires > Date.now()) return cached.data;
-      const data = await request(`/prompt-templates?${params}`);
+      const started = revision;
+      const data = await request(`/prompt-templates?${params}`, { signal });
       const result = {
         total: data.total as number,
         categories: data.categories as string[],
@@ -69,8 +80,10 @@ export function createLibrary(fetcher: typeof fetch = fetch) {
             )
           : [],
       };
-      if (pages.size >= 40) pages.delete(pages.keys().next().value!);
-      pages.set(key, { expires: Date.now() + 30000, data: result });
+      if (started === revision && !signal?.aborted) {
+        if (pages.size >= 40) pages.delete(pages.keys().next().value!);
+        pages.set(key, { expires: Date.now() + 30000, data: result });
+      }
       return result;
     },
     async templates(): Promise<Template[]> {
@@ -78,8 +91,8 @@ export function createLibrary(fetcher: typeof fetch = fetch) {
         JSON.stringify(await request("/prompt-templates/export")),
       );
     },
-    async characters(): Promise<ServerCharacter[]> {
-      const rows = await request("/characters");
+    async characters(signal?: AbortSignal): Promise<ServerCharacter[]> {
+      const rows = await request("/characters", { signal });
       if (
         !Array.isArray(rows) ||
         rows.some(

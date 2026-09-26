@@ -55,10 +55,22 @@ ln -s /path/to/caster/custom_nodes/CASTER_AnimaControl .  # 可选
 
 ### 开发工具
 - pytest：单元测试
+- Ruff：Python 静态检查与统一格式，版本由 `uv.lock` 固定
 - Node.js test runner / tsx：前端测试
 
 ### 实验功能
 - `scripts/render_pose_studio.py`：本地渲染 Pose Studio 人偶（需要浏览器）
+
+### Agent 助手（`aigc/agent/`）
+- `llama-index-core>=0.14.25`：唯一的 Agent 编排框架（FunctionAgent 工具循环）
+- `llama-index-llms-openai-like>=0.8.0`：OpenAI 兼容对话模型客户端
+- 本地基础检索提供模板库的精确匹配与 BM25；配置 `AIGC_RAG_DIR` 后可接入 Qwen3 Embedding
+  和独立部署的 Qdrant 服务
+- `qdrant-client` 已锁定在开发依赖中；Qwen 推理环境与权重由服务器 RAG 工作区管理，不与
+  ComfyUI 环境混装。当前运行边界见 [系统架构](ARCHITECTURE.md)
+- 索引构建、配置与独立评估见 [RAG 维护](RAG.md)
+
+这两个包是纯 Python 依赖树，已由 `uv.lock` 固定；安装后不影响 ComfyUI 的 GPU 调度。
 
 ---
 

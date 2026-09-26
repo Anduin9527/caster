@@ -5,8 +5,9 @@
 ## 文件说明
 
 ### 模板与配图来源
-- `anima-hub.json` — Anima 角色/服装模板的上游来源和版本
-- `anima-outfit-previews.json` — 服装预览图的缓存配置
+- `curated-outfits-v1.json` — 当前 50 套正式服装的配方源；图片可留空
+- `anima-hub.json` — Anima 角色库和历史服装快照的上游版本
+- `anima-outfit-previews.json` — 历史上游服装的预览图映射，不是当前 50 套的图库
 - `anima-pose-control.json` — 姿态控制实验的配置
 
 ### Pose Studio
@@ -22,7 +23,8 @@
 ## 使用方式
 
 这些文件被以下脚本和模块读取：
-- `scripts/import_anima_hub.py` — 导入 Anima 模板到数据库
+- `scripts/import_anima_hub.py` — 重建锁定的 Hub 快照（包含历史服装）
+- `scripts/promote_outfit_catalog.py` — 将已审批的 50 套服装原子替换为正式模板
 - `scripts/cache_template_previews.py` — 缓存模板配图
 - `scripts/cache_pose_studio.py` — 缓存 Pose Studio 渲染图
 - `aigc/templates.py` — 加载模板定义

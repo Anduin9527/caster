@@ -52,7 +52,6 @@ test("template writes use backend endpoints and propagate conflicts, never simul
   );
 });
 
-
 test("template pages reuse cache and invalidate it after a successful write", async () => {
   const calls: string[] = [];
   const api = createLibrary((async (url: string, init?: RequestInit) => {
@@ -90,4 +89,51 @@ test("display translations are excluded from template writes", async () => {
     tags: [...template.tags],
     display: { name: "旅人", categories: [], tags: { "brown hair": "棕发" } },
   });
+});
+
+test("a page started before a template write cannot repopulate the cache with stale data", async () => {
+  let finish!: (response: Response) => void;
+  let reads = 0;
+  const api = createLibrary((async (_url, init) => {
+    if (init?.method) return Response.json({});
+    if (++reads === 1)
+      return new Promise<Response>((resolve) => {
+        finish = resolve;
+      });
+    return Response.json({
+      total: 1,
+      categories: [],
+      items: [{ ...template, name: "新版" }],
+    });
+  }) as typeof fetch);
+  const query = {
+    kind: "character",
+    source: "user",
+    q: "",
+    category: "",
+    offset: 0,
+  };
+  const stale = api.page(query);
+  await api.edit({ ...template, tags: [...template.tags] });
+  assert.equal((await api.page(query)).items[0].name, "新版");
+  finish(Response.json({ total: 1, categories: [], items: [template] }));
+  await stale;
+  assert.equal((await api.page(query)).items[0].name, "新版");
+  assert.equal(reads, 2);
+});
+
+test("closing a template query aborts its fetch and does not populate the page cache", async () => {
+  const controller = new AbortController();
+  const api = createLibrary((async (_url, init) => {
+    controller.abort();
+    assert.equal(init?.signal?.aborted, true);
+    throw new DOMException("cancelled", "AbortError");
+  }) as typeof fetch);
+  await assert.rejects(
+    api.page(
+      { kind: "character", source: "user", q: "", category: "", offset: 0 },
+      controller.signal,
+    ),
+    { name: "AbortError" },
+  );
 });

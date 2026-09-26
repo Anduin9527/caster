@@ -78,6 +78,19 @@ export type ProductionPreset = {
   format: string;
   preview_url: string;
 };
+export type PromptSettings = {
+  schema_version: 1;
+  artist_style: string;
+  fixed_positive: string;
+  fixed_negative: string;
+  content_hash: string;
+  source: "default" | "saved";
+  updated_at?: number | null;
+};
+export type PromptSettingsInput = Pick<
+  PromptSettings,
+  "artist_style" | "fixed_positive" | "fixed_negative"
+>;
 export type ProductionSelection = {
   character_id: string;
   revision: number;
@@ -179,26 +192,48 @@ export function createProductionAPI(fetcher: typeof fetch = fetch) {
   const characterPath = (id: string) =>
     `/production/characters/${encodeURIComponent(id)}`;
   return {
-    async presets(): Promise<ProductionPreset[]> {
+    async promptSettings(signal?: AbortSignal): Promise<PromptSettings> {
+      const response = await fetcher("/api/prompt-settings", {
+        signal: signal
+          ? AbortSignal.any([signal, AbortSignal.timeout(5000)])
+          : AbortSignal.timeout(5000),
+        cache: "no-store",
+      });
+      if (!response.ok)
+        throw new ProductionError("提示词设置暂不可用。", response.status);
+      return response.json();
+    },
+    savePromptSettings(settings: PromptSettingsInput): Promise<PromptSettings> {
+      return write("/prompt-settings", settings, "PUT");
+    },
+    async presets(signal?: AbortSignal): Promise<ProductionPreset[]> {
       const r = await fetcher("/api/production/pose-presets", {
-        signal: AbortSignal.timeout(5000),
+        signal: signal
+          ? AbortSignal.any([signal, AbortSignal.timeout(5000)])
+          : AbortSignal.timeout(5000),
       });
       if (!r.ok) throw new ProductionError("姿态目录暂不可用。", r.status);
       return r.json();
     },
     savePreset(
       index: number,
-      width = 1024, height = 1536,
+      width = 1024,
+      height = 1536,
     ): Promise<{ id: string; render_asset_id: string }> {
-      return write(`/production/pose-presets/${index}?width=${width}&height=${height}`, {});
+      return write(
+        `/production/pose-presets/${index}?width=${width}&height=${height}`,
+        {},
+      );
     },
-    async capabilities(): Promise<{
+    async capabilities(signal?: AbortSignal): Promise<{
       selection: boolean;
       batches: boolean;
       generation_online: boolean;
     }> {
       const r = await fetcher("/api/production/capabilities", {
-        signal: AbortSignal.timeout(5000),
+        signal: signal
+          ? AbortSignal.any([signal, AbortSignal.timeout(5000)])
+          : AbortSignal.timeout(5000),
         cache: "no-store",
       });
       if (!r.ok) throw new ProductionError("后端制作接口尚不可用。", r.status);

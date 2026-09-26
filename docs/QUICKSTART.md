@@ -2,6 +2,8 @@
 
 ## 无 GPU 演示
 
+以下命令在目标开发机器上执行。只预览界面可跳到前端步骤；前端独立安装，不需要 Python 环境。
+
 ### 1. 后端 API（仅模板和状态管理）
 
 ```bash
@@ -16,7 +18,7 @@ INFO:     Application startup complete.
 INFO:     Uvicorn running on http://127.0.0.1:8189
 ```
 
-验证：访问 <http://127.0.0.1:8189/health>，应返回 `{"status":"ok"}`。
+验证：访问 <http://127.0.0.1:8189/health>，正常启动后返回 `{"status":"ok","worker_alive":true}`。
 
 ### 2. 前端工作台
 

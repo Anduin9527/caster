@@ -6,13 +6,24 @@ config.env
 data/
 *.sqlite3
 *.sqlite3-*
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
 *.log
 service.json
 service.lock
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+*.egg-info/
 .DS_Store
+._*
 archive/
 samples/
 reference-validation/
@@ -65,6 +76,9 @@ tests-result.txt
 /ACCEPTANCE.md
 /POSE_AUTOMATION_DESIGN.md
 /REFERENCE_WORKFLOWS.md
+/design-qa.md
+/configure_claude.sh
+/docs/eval/
 /docs/*_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].md
 /docs/research/
 /docs/MIGRATION.md
@@ -88,3 +102,14 @@ tests-result.txt
 /scripts/seed_demo.py
 /scripts/download_additional.py
 /docs/*.local.md
+/docs/*.local.json
+
+# Raw corpora and local experiments belong under ignored runtime storage.
+/experiments/
+/scratch/
+/tmp/
+/models/
+/qdrant/
+
+# Private model connection (API key lives here; written 0600 by the Agent)
+/data/agent/

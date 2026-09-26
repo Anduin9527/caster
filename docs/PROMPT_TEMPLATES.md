@@ -1,28 +1,35 @@
-# Anima 角色与服装模板
+# 角色与服装模板
 
-CASTER 将 [Comfyui-Anima-Tools-HUB](https://github.com/j955229/Comfyui-Anima-Tools-HUB) 的人物、服装数据适配为独立模板库，供现有 AnimaYume 文生图使用。当前交付是后端 API、导入工具与自定义 JSON 上传，不包含上游 Hub 的 ComfyUI 卡片界面、预览图库、随机选择器、LoRA 管理器或 LLM 节点。
+CASTER 把角色与服装作为两类独立模板。角色库来自固定版本的
+[Comfyui-Anima-Tools-HUB](https://github.com/j955229/Comfyui-Anima-Tools-HUB)；当前产品服装库是
+`integrations/curated-outfits-v1.json` 中的 50 套模板。服装模板不包含画师风格、固定质量词或
+通用负面词，这些由 Anima 运行时设置管理。
 
-固定上游版本 `a0c351e81a24ebdbc7f47c524139a8dfe1226705`：`js/character_official_data.json` 中 7,999 个角色，`js/clothing_data.js` 中 430 套服装。来源、版本、文件 SHA256 见 `integrations/anima-hub.json`。上游 `pyproject.toml` 声明 MIT，仓库树未见独立 LICENSE 文件；本集成不将上游代码、图库或完整数据复制进 Git。需要时显式下载到忽略的 `data/`。导入脚本核对固定 SHA256，解析 JSON 字面量，不运行下载的 JS；不下载预览图。
+上游快照 `a0c351e81a24ebdbc7f47c524139a8dfe1226705` 包含 7,999 个角色和 430 套历史服装；
+后者只作为来源参考，不再是正式产品目录。来源、版本与 SHA256 见
+`integrations/anima-hub.json`。上游完整数据和图库不进 Git，需要时才下载到已忽略的 `data/`。
 
-## 导入上游库
+## 导入与更新
+
+`scripts/import_anima_hub.py` 用于重建上游快照，会同时包含历史的 430 套服装。不要将它直接
+导入当前产品数据库，否则会重新引入已淘汰目录。它的用途是重建角色源数据、溯源或离线研究：
 
 在本地项目根目录：
 
 ```bash
-uv run --locked python scripts/import_anima_hub.py --data-dir data
+uv run --locked python scripts/import_anima_hub.py
 ```
 
-默认生成 `data/anima-hub.templates.json` 和来源清单，同时导入本地 `data/state.sqlite3`。如果设置了 `AIGC_DATA_DIR`，请将 `--data-dir` 显式指向相同目录。已有本地文件可用 `--source-dir /path/to/hub`，目录须含原版 `js/` 文件，并通过固定版本哈希校验。
+默认只生成 `data/anima-hub.templates.json` 和来源清单。传入 `--data-dir` 才会写本地数据库。
+已有本地文件可用 `--source-dir /path/to/hub`，目录须含原版 `js/` 文件并通过固定哈希校验。
 
-向已部署 API 导入时只提交 JSON，不复制或覆盖运行数据库：
+正式 50 套服装由维护脚本从已审批 catalog 原子替换：
 
 ```bash
-curl -F 'file=@data/anima-hub.templates.json' http://127.0.0.1:8189/prompt-templates/import
+uv run --locked python scripts/promote_outfit_catalog.py --help
 ```
 
-此命令要求目标 API 已部署新功能。当前本地开发不自动部署或重启远端服务。
-
-导入为事务操作：相同 ID 与相同内容重复提交只跳过；相同 ID 内容不同返回 409，整批回滚，不覆盖用户编辑。不同上游 revision 对应不同模板 ID。当前 bundle v1 每次最多 10,000 项、16 MiB。
+该操作会修改模板库，必须使用脚本要求的 catalog/settings 审批哈希。不要在普通启动或部署时自动执行。
 
 ## 搜索、预览和创建角色
 

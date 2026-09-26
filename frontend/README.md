@@ -1,4 +1,4 @@
-# CASTER 角色制作手账
+# CASTER 工作台
 
 中文 React + TypeScript + Vite 工作台。默认 `/` 使用真实后端；`?preview=1` 保留独立本地原型，演示任务与批准不会迁移到服务器。
 
@@ -10,7 +10,10 @@ npm ci
 npm run dev -- --port 4173 --strictPort
 ```
 
-开发服务仅监听回环，`/api` 同源代理默认连接本机 `127.0.0.1:8189` SSH 隧道。隧道配置见 `../docs/OPERATIONS.md`；代理目标读取根目录 `config.env` 的 `AIGC_API_URL`，开发端口读取 `AIGC_UI_URL`。先在根目录运行 `uv sync --locked --group dev` 准备配置读取环境。不要将凭据写入客户端。构建使用 `npm run build`，本轮没有公开部署网站。
+在目标开发机器上运行 Node.js 22.12+。开发服务默认监听回环，`/api` 同源代理连接 `127.0.0.1:8189`。
+远程访问见[运行手册](../docs/OPERATIONS.md)。Node 只从根目录 `config.env` 读取 `AIGC_API_URL` 与
+`AIGC_UI_URL`；进程环境变量优先，也可通过 `AIGC_CONFIG_FILE` 选择配置文件。没有配置时使用默认值，
+无需 Python 或 `.venv`。模型凭据由后端管理。
 
 ## 制作流程
 
@@ -23,6 +26,9 @@ npm run dev -- --port 4173 --strictPort
 ## 接口与数据边界
 
 `src/production.ts` 封装真实制作接口，`src/library.ts` 访问模板库，`src/LiveWorkbench.tsx` 实现默认工作台。
+
+`src/AgentPanel.tsx` 管理对话与事件流；`src/agent/` 分别显示连接设置、检索证据、工具轨迹和审批卡。
+`src/agent.ts` 封装 Agent 接口与公开类型。历史演示通过动态导入仅在 `?preview=1` 下加载。
 
 - `/production/capabilities`、`/production/snapshot`：读取能力、真实任务、资产、批准、选择及批次。
 - `/production/characters/{id}/outfits|selection|batches|manifest`：服装不可变版本、明确选用、批次与清单下载。
@@ -37,10 +43,7 @@ npm run dev -- --port 4173 --strictPort
 `?preview=1` 使用 `src/model.ts`、`src/adapter.ts` 的演示状态；历史图片由 `predev`/`prebuild` 从 `samples/` 准备，不入 Git。缺失图片明确提示。演示 JSON 下载使用内存附件服务；Sites 或纯静态托管需要另行配置 API 和附件服务。
 
 ```bash
-npm run typecheck
-npm test
-npm run build
-npm run test:sites
+npm run check
 ```
 
 

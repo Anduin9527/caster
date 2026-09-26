@@ -1,9 +1,40 @@
 [project]
 name = "caster-aigc"
 version = "0.1.0"
+description = "Human-approved agent workflows for character asset production with ComfyUI"
+readme = "README.md"
+license = "MIT"
 requires-python = ">=3.12"
-dependencies = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1", "httpx>=0.27,<1", "pydantic>=2.9,<3", "pillow>=11,<13", "python-multipart>=0.0.18", "websockets>=14,<17"]
+dependencies = [
+    "fastapi>=0.115,<1",
+    "uvicorn>=0.30,<1",
+    "httpx>=0.27,<1",
+    "pydantic>=2.9,<3",
+    "pillow>=11,<13",
+    "python-multipart>=0.0.18",
+    "websockets>=14,<17",
+    "llama-index-core>=0.14.25",
+    "llama-index-llms-openai-like>=0.8.0",
+]
 [dependency-groups]
-dev = ["pytest>=8,<10"]
+dev = ["pytest>=8,<10", "qdrant-client>=1.19,<2", "ruff>=0.13,<1"]
+
+# Workflows and integrations are loaded from this checkout; this is an
+# application workspace, not a standalone wheel.
+[tool.uv]
+package = false
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = ["data", "deployment", "samples", "frontend", "custom_nodes/CASTER_AnimaControl"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*.py" = ["E402"]

@@ -1,0 +1,29 @@
+# Example isolated embedding environment with CUDA 12.6 wheels.
+# Match this source to the target device/driver, copy to a RAG workspace as
+# pyproject.toml, then generate and retain uv.lock there. See docs/RAG.md.
+
+[project]
+name = "caster-rag-embed"
+version = "1.0.0"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    # CUDA 12.6 example; validate compatibility on the target server.
+    "torch==2.14.0+cu126",
+    "transformers==5.17.0",
+    "accelerate",
+    "huggingface_hub",
+    "numpy",
+    "qdrant-client==1.19.1",
+]
+
+[[tool.uv.index]]
+url = "https://download.pytorch.org/whl/cu126"
+name = "pytorch-cu126"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu126" }
+
+# Dependency-only project: no package is built or installed from this directory.
+[tool.uv]
+package = false

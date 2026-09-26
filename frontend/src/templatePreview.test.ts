@@ -37,3 +37,9 @@ test("template images use only the same-origin backend cache", () => {
   assert.ok(!url.includes('https://'));
   assert.notEqual(url, templatePreview({...base,source_key:'another||series'}));
 });
+
+test("curated outfit images use the backend without inventing an upstream URL", () => {
+  const curated = {...base, kind: "outfit" as const, source: "caster://curated-outfits-v1"};
+  assert.equal(templateSource(curated), undefined);
+  assert.ok(templatePreview(curated)?.startsWith('/api/prompt-templates/a/image?v='));
+});
