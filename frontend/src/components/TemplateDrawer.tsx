@@ -27,7 +27,7 @@ function TemplateImage({ template }: { template: Template }) {
     <img
       className="template-preview"
       src={url}
-      alt={`${template.name} · 上游参考图`}
+      alt={`${template.name} · 模板参考图`}
       loading="lazy"
       decoding="async"
       referrerPolicy="no-referrer"
@@ -255,7 +255,9 @@ export function TemplateDrawer({
           {error}
         </p>
       )}
-      <p className="small muted">配图来自上游模板库，仅作角色与服装参考。</p>
+      <p className="small muted">
+        配图用于角色与服装参考，实际生成效果以候选图为准。
+      </p>
       {loading && <p role="status">正在加载模板…</p>}
       {loadError && (
         <p role="alert">
@@ -344,7 +346,12 @@ export function TemplateDrawer({
                   .join(" / ")}
               </p>
               <p className="small muted">
-                来源：{selected.source === "user" ? "个人模板" : "上游数据"}
+                来源：
+                {selected.source === "user"
+                  ? "个人模板"
+                  : selected.source === "caster://curated-outfits-v1"
+                    ? "CASTER 精选库"
+                    : "上游数据"}
                 <br />
                 {selected.source_revision?.slice(0, 10)}
               </p>

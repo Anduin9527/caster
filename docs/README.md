@@ -11,4 +11,4 @@
 - [角色制作 Skill](../.agents/skills/caster-character-production/SKILL.md)：Agent 操作指南。
 - [上游资源](../integrations/README.md)：来源、固定版本与预设定义。
 
-`images/` 保存 README 使用的功能展示图片。
+`images/` 只保存 README 使用的精选展示图片：像素横幅、真实 Agent 交互截图、当前模板库以及动作与表情效果。原始采集记录、临时预览和测试对话保存在被忽略的 `data/` 中。
