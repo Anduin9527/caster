@@ -1,3 +1,4 @@
+import { ActionLink } from "./components/ActionLink";
 import { expressionLabel, jobErrorLabel } from "./presentation";
 import { useEffect, useState } from "react";
 import {
@@ -131,12 +132,12 @@ export function ProductionRecords({ characterId }: { characterId: string }) {
                               }
                             />
                           </a>
-                          <a
+                          <ActionLink
                             href={productionAssetURL(asset.id)}
                             download={`${asset.id}.png`}
                           >
                             下载原图
-                          </a>
+                          </ActionLink>
                         </div>
                       );
                     })}

@@ -16,6 +16,8 @@ import {
 } from "@phosphor-icons/react";
 import { Modal } from "./components/Modal";
 import { Brand } from "./components/Brand";
+import { ActionLink } from "./components/ActionLink";
+import { AssetThumbnail } from "./components/AssetThumbnail";
 import { appearanceTags } from "./appearanceTags";
 import {
   CharacterAvatar,
@@ -556,10 +558,8 @@ export function LiveWorkbench() {
           onClick={() => setLightbox(asset)}
           aria-label={`查看图片 ${asset.id.slice(0, 6)}`}
         >
-          <img
-            loading="lazy"
-            decoding="async"
-            src={`/api/assets/${encodeURIComponent(asset.id)}/thumbnail`}
+          <AssetThumbnail
+            assetId={asset.id}
             alt={`${outfitName(asset.spec.outfit_id)} · ${expressionName(asset.spec.expression)}`}
           />
         </button>
@@ -590,9 +590,13 @@ export function LiveWorkbench() {
               {checked ? "已选中" : "选择这张"}
             </label>
           ) : (
-            <a href={productionAssetURL(asset.id)} download={`${asset.id}.png`}>
+            <ActionLink
+              href={productionAssetURL(asset.id)}
+              download={`${asset.id}.png`}
+            >
+              <DownloadSimple size={18} />
               下载原图
-            </a>
+            </ActionLink>
           )}
         </div>
       </article>
@@ -752,12 +756,12 @@ export function LiveWorkbench() {
         </>
       ) : (
         <>
-          <a
+          <ActionLink
             href={`/api/production/characters/${encodeURIComponent(active)}/manifest`}
             download="caster-assets.json"
           >
             下载角色清单
-          </a>
+          </ActionLink>
           <label>
             服装
             <Select
@@ -896,12 +900,7 @@ export function LiveWorkbench() {
       {source && step >= 2 && step <= 4 && (
         <div className="selected-parent">
           <strong>本次使用的图片</strong>
-          <img
-            loading="lazy"
-            decoding="async"
-            src={`/api/assets/${encodeURIComponent(source.id)}/thumbnail`}
-            alt="当前来源图片"
-          />
+          <AssetThumbnail assetId={source.id} alt="当前来源图片" />
           <button className="text-button" onClick={() => go(step - 1)}>
             重新选择来源图片
           </button>
@@ -1459,10 +1458,8 @@ export function LiveWorkbench() {
                     <tr>
                       <th>
                         {source && (
-                          <img
-                            loading="lazy"
-                            decoding="async"
-                            src={`/api/assets/${encodeURIComponent(source.id)}/thumbnail`}
+                          <AssetThumbnail
+                            assetId={source.id}
                             alt="所选中性姿态"
                           />
                         )}
@@ -1822,37 +1819,41 @@ export function LiveWorkbench() {
       {lightbox && (
         <Modal title="查看原图" wide onClose={() => setLightbox(null)}>
           <img
-            className="live-full-image"
+            className="live-full-image media-lightbox-image"
             src={productionAssetURL(lightbox.id)}
             alt="服务器原图"
           />
-          <a
-            href={productionAssetURL(lightbox.id)}
-            download={`${lightbox.id}.png`}
-          >
-            <DownloadSimple size={18} />
-            下载原图
-          </a>
-          {step >= 1 &&
-            step <= 3 &&
-            (candidates.some((a) => a.id === lightbox.id) ||
-              (step === 2 && lightbox.id === selection.identity_asset_id)) && (
+          <div className="modal-actions">
+            <ActionLink
+              className="primary"
+              href={productionAssetURL(lightbox.id)}
+              download={`${lightbox.id}.png`}
+            >
+              <DownloadSimple size={18} />
+              下载原图
+            </ActionLink>
+            {step >= 1 &&
+              step <= 3 &&
+              (candidates.some((a) => a.id === lightbox.id) ||
+                (step === 2 &&
+                  lightbox.id === selection.identity_asset_id)) && (
+                <button
+                  disabled={busy || !connected || selectedId === lightbox.id}
+                  onClick={() => void choose(lightbox, stage)}
+                >
+                  {selectedId === lightbox.id ? "已选中" : "选用这张图片"}
+                </button>
+              )}
+
+            {canMatte(lightbox) && (
               <button
-                disabled={busy || !connected || selectedId === lightbox.id}
-                onClick={() => void choose(lightbox, stage)}
+                disabled={busy || !online || !!pending}
+                onClick={() => void makeTransparent(lightbox)}
               >
-                {selectedId === lightbox.id ? "已选中" : "选用这张图片"}
+                制作透明图片
               </button>
             )}
-
-          {canMatte(lightbox) && (
-            <button
-              disabled={busy || !online || !!pending}
-              onClick={() => void makeTransparent(lightbox)}
-            >
-              制作透明图片
-            </button>
-          )}
+          </div>
         </Modal>
       )}
     </div>

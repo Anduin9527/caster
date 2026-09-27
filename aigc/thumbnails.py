@@ -7,10 +7,10 @@ from PIL import Image, ImageOps
 
 
 @lru_cache(maxsize=128)
-def thumbnail(path: str, version: str) -> bytes:
+def thumbnail(path: str, version: str, size: int = 384) -> bytes:
     with Image.open(path) as source:
         image = ImageOps.exif_transpose(source).convert("RGBA")
-        image.thumbnail((384, 384), Image.Resampling.LANCZOS)
+        image.thumbnail((size, size), Image.Resampling.LANCZOS)
         output = BytesIO()
-        image.save(output, format="WEBP", quality=82)
+        image.save(output, format="WEBP", quality=92)
         return output.getvalue()

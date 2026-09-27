@@ -24,7 +24,9 @@ textarea,
 summary {
   font-weight: 700;
 }
-button {
+button,
+.action-link,
+.file-button {
   border: 4px solid #000;
   box-shadow: 4px 4px 0 #000;
   background: #fff;
@@ -34,23 +36,29 @@ button {
     box-shadow 0.18s ease-out,
     background 0.18s ease-out;
 }
-button:hover:not(:disabled) {
+button:hover:not(:disabled),
+.action-link:hover,
+.file-button:hover {
   background: var(--yellow);
   box-shadow: 4px 4px 0 var(--teal);
   transform: translate(-1px, -1px);
 }
-button:active:not(:disabled) {
+button:active:not(:disabled),
+.action-link:active,
+.file-button:active {
   box-shadow: none;
   transform: translate(3px, 3px) scale(0.98);
 }
-button.primary {
+button.primary,
+.action-link.primary {
   background: var(--red);
   color: #000;
   border: 4px solid #000;
   box-shadow: 5px 5px 0 #000;
   font-weight: 900;
 }
-button.primary:hover:not(:disabled) {
+button.primary:hover:not(:disabled),
+.action-link.primary:hover {
   background: var(--teal);
   color: #000;
   box-shadow: 5px 5px 0 var(--red);
@@ -65,6 +73,42 @@ button.primary:disabled {
 button.selected {
   background: var(--yellow);
   box-shadow: 4px 4px 0 #000;
+}
+.action-link,
+.file-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  line-height: normal;
+  text-decoration: none;
+  cursor: pointer;
+}
+.action-link:visited {
+  color: var(--ink);
+}
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 0 6px;
+  position: sticky;
+  bottom: 0;
+  background: var(--paper);
+  border-top: 3px solid var(--ink);
+  z-index: 1;
+}
+.modal .media-lightbox-image {
+  max-height: calc(100dvh - 300px);
+  object-fit: contain;
+}
+.file-button:focus-within {
+  outline: 3px solid var(--ink);
+  outline-offset: 4px;
 }
 :where(button, a, input, textarea, summary):focus-visible {
   outline: 3px solid #000;

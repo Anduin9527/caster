@@ -97,6 +97,14 @@ def test_thumbnail_preserves_alpha_original_and_cache(tmp_path, monkeypatch):
                 await c.get(url, headers={"If-None-Match": r.headers["etag"]})
             ).status_code == 304
             assert (await c.get("/assets/missing/thumbnail")).status_code == 404
+            medium = await c.get(url + "?size=768")
+            assert medium.status_code == 200
+            assert Image.open(BytesIO(medium.content)).size == (525, 768)
+            large = await c.get(url + "?size=1536", headers={"If-None-Match": medium.headers["etag"]})
+            assert large.status_code == 200
+            assert Image.open(BytesIO(large.content)).size == (832, 1216)
+            assert len({r.headers["etag"], medium.headers["etag"], large.headers["etag"]}) == 3
+            assert (await c.get(url + "?size=9999")).status_code == 422
             assert (await c.get(f"/assets/{asset['id']}/file")).content == before
 
     asyncio.run(check())

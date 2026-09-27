@@ -1,6 +1,7 @@
 """Assets endpoints with per-application dependencies."""
 
 from collections.abc import Callable
+from typing import Literal
 
 from fastapi import APIRouter, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.responses import FileResponse
@@ -49,16 +50,16 @@ def assets_router(get_store: Callable[[], Store]) -> APIRouter:
         )
 
     @router.get("/assets/{id}/thumbnail")
-    def asset_thumbnail(id: str, request: Request):
+    def asset_thumbnail(id: str, request: Request, size: Literal["384", "768", "1536"] = "384"):
         store = get_store()
         a = required(store, "asset", id)
         path = asset_path(store, a)
         version = a.get("sha256") or str(path.stat().st_mtime_ns)
-        etag = '"thumb-v1-' + version + '"'
+        etag = f'"thumb-v2-{size}-{version}"'
         headers = {"Cache-Control": "private, max-age=31536000, immutable", "ETag": etag}
         if request.headers.get("if-none-match") == etag:
             return Response(status_code=304, headers=headers)
-        return Response(thumbnail(str(path), version), media_type="image/webp", headers=headers)
+        return Response(thumbnail(str(path), version, int(size)), media_type="image/webp", headers=headers)
 
     @router.post("/assets/{id}/approve")
     async def approve(id: str, body: Approval):
