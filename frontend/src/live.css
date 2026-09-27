@@ -17,15 +17,80 @@
   border: 2px solid #000;
   margin-bottom: 12px;
 }
-.character-avatar-preview {
-  display: block;
-  width: 180px;
-  height: 180px;
-  max-width: 100%;
-  object-fit: contain;
+.character-avatar-input {
+  margin: 24px 0 28px;
+}
+.avatar-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-weight: 800;
+}
+.avatar-heading span {
+  padding: 2px 7px;
+  border: 2px solid var(--ink);
+  background: var(--yellow);
+  font-size: 12px;
+}
+.character-avatar-input .avatar-upload-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 240px;
+  max-width: calc(100% - 6px);
+  min-height: 180px;
+  padding: 24px;
+  background: #effaf7;
+  border: 3px solid var(--ink);
+  box-shadow: 6px 6px 0 var(--teal);
+}
+.character-avatar-input .avatar-upload-card:hover:not(:disabled) {
+  background: var(--mint);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.avatar-upload-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 2px solid var(--ink);
+  background: white;
+  box-shadow: 3px 3px 0 var(--teal);
+}
+.avatar-upload-caption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.character-avatar-input .avatar-upload-card.has-image {
+  gap: 0;
+  padding: 0;
   background: #f1efe6;
-  border: 2px solid #000;
-  margin: 12px 0;
+  overflow: hidden;
+}
+.has-image .avatar-upload-caption {
+  align-self: stretch;
+  padding: 12px;
+  border-top: 3px solid var(--ink);
+  background: var(--mint);
+}
+.avatar-upload-card .character-avatar-preview {
+  display: block;
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+}
+.character-avatar-input .avatar-remove {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 18px;
+  padding: 7px 12px;
+  font-size: 13px;
 }
 .candidate-empty {
   max-width: 680px;
@@ -38,9 +103,8 @@
   color: var(--ink);
   font-size: 20px;
 }
-.candidate-empty p {
-  margin: 12px 0;
-  line-height: 1.8;
+.candidate-empty button {
+  margin-top: 18px;
 }
 .live-workbench .topbar {
   display: flex;

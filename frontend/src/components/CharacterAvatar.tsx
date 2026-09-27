@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { ImageSquare, ArrowClockwise, Trash } from "@phosphor-icons/react";
+import { useEffect, useRef, useState } from "react";
 import { readAvatar, saveAvatar, validateAvatar } from "../avatarStorage";
 
 function useAvatar(characterId: string, revision = 0) {
@@ -46,6 +47,7 @@ export function CharacterAvatarInput({
   const { url, error } = useAvatar(id, revision);
   const [message, setMessage] = useState("");
   const [working, setWorking] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
   async function change(file: File | null) {
     setWorking(true);
     onBusy(true);
@@ -54,7 +56,6 @@ export function CharacterAvatarInput({
       if (file) await validateAvatar(file);
       await saveAvatar(id, file);
       setRevision((value) => value + 1);
-      setMessage(file ? "参考图已保存在此浏览器。" : "已移除参考图。");
     } catch (reason) {
       setMessage((reason as Error).message);
     } finally {
@@ -64,43 +65,57 @@ export function CharacterAvatarInput({
   }
   return (
     <div className="character-avatar-input">
-      <label>
-        头像 / 参考图（可选）
-        <input
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          disabled={disabled || working}
-          onChange={(event) => {
-            const file = event.currentTarget.files?.[0];
-            event.currentTarget.value = "";
-            if (file) void change(file);
-          }}
-        />
-      </label>
-      {url && (
-        <img
-          className="character-avatar-preview"
-          src={url}
-          alt="新角色的头像参考"
-        />
-      )}
+      <div className="avatar-heading">
+        头像 / 参考图 <span>可选</span>
+      </div>
+      <input
+        ref={input}
+        style={{ display: "none" }}
+        aria-label="选择头像图片"
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        disabled={disabled || working}
+        onChange={(event) => {
+          const file = event.currentTarget.files?.[0];
+          event.currentTarget.value = "";
+          if (file) void change(file);
+        }}
+      />
+      <button
+        type="button"
+        className={`avatar-upload-card${url ? " has-image" : ""}`}
+        disabled={disabled || working}
+        onClick={() => input.current?.click()}
+        aria-label={url ? "更换图片" : "上传图片"}
+        aria-busy={working}
+      >
+        {url ? (
+          <img
+            className="character-avatar-preview"
+            src={url}
+            alt="新角色的头像参考"
+          />
+        ) : (
+          <span className="avatar-upload-icon">
+            <ImageSquare size={32} weight="bold" />
+          </span>
+        )}
+        <span className="avatar-upload-caption">
+          {url && <ArrowClockwise size={18} weight="bold" />}
+          {working ? "保存中…" : url ? "更换图片" : "上传图片"}
+        </span>
+      </button>
       {url && (
         <button
           type="button"
+          className="avatar-remove"
           disabled={disabled || working}
           onClick={() => void change(null)}
         >
-          移除参考图
+          <Trash size={16} weight="bold" /> 移除
         </button>
       )}
-      <p className="small muted">
-        仅用于角色展示，不参与生成或候选选择。图片保存在当前浏览器，
-        刷新后保留；清除网站数据或更换网址、浏览器后不会同步。支持
-        PNG、JPEG、WebP，最大 10 MiB。
-      </p>
-      {(message || error || working) && (
-        <p role="status">{working ? "正在保存参考图…" : message || error}</p>
-      )}
+      {(message || error) && <p role="alert">{message || error}</p>}
     </div>
   );
 }

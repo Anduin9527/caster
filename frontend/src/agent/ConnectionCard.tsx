@@ -41,7 +41,7 @@ export function ConnectionCard({
         remember: true,
         keep_existing_key: keepKey,
       });
-      let note = "模型连接已保存，重新打开当前工作台无需再填写。";
+      let note = "连接已保存。";
       try {
         const copy = rememberBrowser ? connectionToRemember(form) : null;
         rememberConnection(copy);
@@ -151,12 +151,6 @@ export function ConnectionCard({
         />
         在此浏览器记住连接（包括密钥）
       </label>
-      <p className="small muted">
-        保存后，当前后端会持续记住连接。浏览器副本只用于同一网址下自动填入表单，不会自动覆盖另一后端的连接。
-      </p>
-      {settings.has_api_key && (
-        <p className="small">密钥已保存；留空即可继续使用，不必重复输入。</p>
-      )}
       {hasBrowserCopy && (
         <button
           type="button"
@@ -167,7 +161,7 @@ export function ConnectionCard({
               setHasBrowserCopy(false);
               setRememberBrowser(false);
               setForm({ ...form, api_key: "" });
-              setMessage("已清除此浏览器的连接副本，服务端连接保持不变。");
+              setMessage("浏览器副本已清除。");
             } catch {
               setMessage("浏览器存储不可用，未能清除连接副本。");
             }
