@@ -59,7 +59,9 @@ def assets_router(get_store: Callable[[], Store]) -> APIRouter:
         headers = {"Cache-Control": "private, max-age=31536000, immutable", "ETag": etag}
         if request.headers.get("if-none-match") == etag:
             return Response(status_code=304, headers=headers)
-        return Response(thumbnail(str(path), version, int(size)), media_type="image/webp", headers=headers)
+        return Response(
+            thumbnail(str(path), version, int(size)), media_type="image/webp", headers=headers
+        )
 
     @router.post("/assets/{id}/approve")
     async def approve(id: str, body: Approval):

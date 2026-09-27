@@ -100,7 +100,9 @@ def test_thumbnail_preserves_alpha_original_and_cache(tmp_path, monkeypatch):
             medium = await c.get(url + "?size=768")
             assert medium.status_code == 200
             assert Image.open(BytesIO(medium.content)).size == (525, 768)
-            large = await c.get(url + "?size=1536", headers={"If-None-Match": medium.headers["etag"]})
+            large = await c.get(
+                url + "?size=1536", headers={"If-None-Match": medium.headers["etag"]}
+            )
             assert large.status_code == 200
             assert Image.open(BytesIO(large.content)).size == (832, 1216)
             assert len({r.headers["etag"], medium.headers["etag"], large.headers["etag"]}) == 3
