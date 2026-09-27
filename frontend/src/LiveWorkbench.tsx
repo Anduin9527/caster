@@ -15,6 +15,7 @@ import {
   DownloadSimple,
 } from "@phosphor-icons/react";
 import { Modal } from "./components/Modal";
+import { Brand } from "./components/Brand";
 import { TemplateDrawer } from "./components/TemplateDrawer";
 const AgentPanel = lazy(() =>
   import("./AgentPanel").then(({ AgentPanel }) => ({ default: AgentPanel })),
@@ -1076,9 +1077,7 @@ export function LiveWorkbench() {
   return (
     <div className="live-workbench">
       <header className="topbar">
-        <a className="brand" href="/">
-          CASTER <small>角色制作手账</small>
-        </a>
+        <Brand />
         <Select
           aria-label="切换角色"
           disabled={busy}

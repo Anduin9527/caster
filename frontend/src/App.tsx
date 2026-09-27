@@ -1,5 +1,6 @@
 import { useStepNavigation } from "./useStepNavigation";
 import { Modal } from "./components/Modal";
+import { Brand } from "./components/Brand";
 import { TemplateDrawer } from "./components/TemplateDrawer";
 import { Empty } from "./components/Empty";
 import { Select } from "./Select";
@@ -23,7 +24,6 @@ import {
   Eye,
   Stack,
   WifiSlash,
-  Flower,
   Paperclip,
   Person,
   Smiley,
@@ -1660,19 +1660,12 @@ export function App() {
   return (
     <div className={`app ${collapsed ? "tasks-collapsed" : ""}`}>
       <header className="topbar">
-        <a
-          className="brand"
-          href="#"
+        <Brand
           onClick={(e) => {
             e.preventDefault();
             go(0);
           }}
-        >
-          <Flower size={33} weight="bold" />
-          <span>
-            CASTER<small>角色制作手账</small>
-          </span>
-        </a>
+        />
         <div className="header-center">
           <button
             className="text-button notebook-label"
