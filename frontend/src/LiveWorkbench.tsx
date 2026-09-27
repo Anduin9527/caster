@@ -97,6 +97,7 @@ function readIntent(id: string): ProductionBatchRequest | null {
 
 export function LiveWorkbench() {
   const [characters, setCharacters] = useState<ServerCharacter[]>([]);
+  const [characterQuery, setCharacterQuery] = useState("");
   const {
     active,
     setActive,
@@ -1092,21 +1093,6 @@ export function LiveWorkbench() {
     <div className="live-workbench">
       <header className="topbar">
         <Brand />
-        <Select
-          aria-label="切换角色"
-          disabled={busy}
-          value={active}
-          onValueChange={(value) => {
-            setActive(value);
-          }}
-        >
-          <option value="">选择角色</option>
-          {characters.map((c) => (
-            <option value={c.id} key={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </Select>
         <button
           className={agentOpen ? "selected" : ""}
           onClick={() => {
@@ -1185,36 +1171,67 @@ export function LiveWorkbench() {
         <aside className="settings desktop-settings">{settings}</aside>
         <main>
           <div className="workspace">
-            <h1>
-              {step === 0
-                ? "选择你的角色"
-                : step === 1
-                  ? "确定角色的模样"
-                  : step === 2
-                    ? "为角色搭配服装"
-                    : step === 3
-                      ? "选择想要的姿态"
-                      : step === 4
-                        ? "为姿态添加表情"
-                        : "下载角色资产"}
-            </h1>
+            <div className="workbench-heading">
+              <h1>
+                {step === 0
+                  ? "选择你的角色"
+                  : step === 1
+                    ? "确定角色的模样"
+                    : step === 2
+                      ? "为角色搭配服装"
+                      : step === 3
+                        ? "选择想要的姿态"
+                        : step === 4
+                          ? "为姿态添加表情"
+                          : "下载角色资产"}
+              </h1>
+              {step === 0 ? (
+                <input
+                  className="character-search"
+                  type="search"
+                  aria-label="搜索角色"
+                  placeholder="搜索角色"
+                  value={characterQuery}
+                  onChange={(event) => setCharacterQuery(event.target.value)}
+                />
+              ) : (
+                character && (
+                  <span className="active-character-name">
+                    {character.name}
+                  </span>
+                )
+              )}
+            </div>
             {step === 0 ? (
               <>
                 <div className="live-character-list">
-                  {characters.map((c) => (
-                    <button
-                      key={c.id}
-                      className={active === c.id ? "selected-candidate" : ""}
-                      disabled={busy}
-                      onClick={() => setActive(c.id)}
-                    >
-                      <CharacterAvatar id={c.id} name={c.name} />
-                      <strong>{c.name}</strong>
-                      <p>{c.fixed_tags.join("、")}</p>
-                      <span>{active === c.id ? "当前角色" : "使用角色"}</span>
-                    </button>
-                  ))}
+                  {characters
+                    .filter((c) =>
+                      `${c.name} ${c.fixed_tags.join(" ")}`
+                        .toLocaleLowerCase()
+                        .includes(characterQuery.trim().toLocaleLowerCase()),
+                    )
+                    .map((c) => (
+                      <button
+                        key={c.id}
+                        className={active === c.id ? "selected-candidate" : ""}
+                        disabled={busy}
+                        aria-pressed={active === c.id}
+                        onClick={() => setActive(c.id, 0)}
+                      >
+                        <CharacterAvatar id={c.id} name={c.name} />
+                        <strong>{c.name}</strong>
+                        <p>{c.fixed_tags.join("、")}</p>
+                        <span>{active === c.id ? "当前角色" : "使用角色"}</span>
+                      </button>
+                    ))}
                 </div>
+                {characterQuery.trim() &&
+                  !characters.some((c) =>
+                    `${c.name} ${c.fixed_tags.join(" ")}`
+                      .toLocaleLowerCase()
+                      .includes(characterQuery.trim().toLocaleLowerCase()),
+                  ) && <p role="status">未找到角色</p>}
                 <details
                   className="live-new-character"
                   open={characterFormOpen}
@@ -1397,9 +1414,30 @@ export function LiveWorkbench() {
                 )}
                 {!candidates.length && (
                   <div className="empty candidate-empty" role="status">
-                    <strong>暂无候选图片</strong>
-                    {step === 1 && (
-                      <button onClick={() => go(0)}>返回角色设定</button>
+                    <strong>
+                      {activeJobs.length ? "候选图片生成中…" : "暂无候选图片"}
+                    </strong>
+                    {activeJobs.length ? (
+                      <button
+                        onClick={() => {
+                          setAgentOpen(false);
+                          setTasksOpen(true);
+                        }}
+                      >
+                        查看进度
+                      </button>
+                    ) : (
+                      step === 1 && (
+                        <button
+                          className="primary"
+                          disabled={
+                            busy || !connected || !online || !data || !!pending
+                          }
+                          onClick={() => void submit()}
+                        >
+                          {busy ? "正在提交…" : "生成角色候选"}
+                        </button>
+                      )
                     )}
                   </div>
                 )}
@@ -1488,7 +1526,7 @@ export function LiveWorkbench() {
           <footer className="actionbar">
             <span>
               {step === 0
-                ? "选好角色，继续制作"
+                ? character?.name || "选择角色"
                 : step === 1
                   ? "选一张角色图"
                   : step === 2
@@ -1508,6 +1546,8 @@ export function LiveWorkbench() {
                     busy ||
                     !connected ||
                     !online ||
+                    !data ||
+                    !!activeJobs.length ||
                     !!pending ||
                     (step === 2 && !outfitIds.length) ||
                     (step === 3 && !poseIds.length) ||

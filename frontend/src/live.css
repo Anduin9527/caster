@@ -8,6 +8,28 @@
   font-weight: 500;
   line-height: 1.7;
 }
+.workbench-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.workbench-heading h1 {
+  margin: 0;
+}
+.live-workbench .workbench-heading input.character-search[type="search"] {
+  width: 260px;
+  max-width: 100%;
+  margin: 0;
+}
+.active-character-name {
+  padding: 8px 12px;
+  border: 2px solid var(--ink);
+  background: var(--mint);
+  font-weight: 700;
+}
 .character-avatar {
   display: block;
   width: 96px;
