@@ -105,11 +105,13 @@ npm run dev
 
 ### 连接模型与生成环境
 
-1. 在 **创作助手 → 模型连接** 中保存支持 function calling 的 OpenAI-compatible 服务。API Key 仅写入后端数据目录，文件权限为 `0600`。
+1. 在 **创作助手 → 模型连接** 中保存支持 function calling 的 OpenAI-compatible 服务。后端连接文件权限为 `0600`，重新打开同一工作台无需重填；可勾选浏览器记忆，在当前网址的浏览器存储中保留连接（包括密钥），也可清除该副本。
 2. 按[依赖说明](docs/DEPENDENCIES.md)准备 ComfyUI、节点和模型，将 `config.env` 的 `AIGC_COMFY_URL` 指向服务。
 3. 按[快速开始](docs/QUICKSTART.md)准备模板与 Pose Studio 资源，选择角色后开始制作。需要语义检索时，再配置 [RAG](docs/RAG.md)。
 
 `config.env`、运行数据库、密钥、日志、模型权重和批量生成图片均排除在 Git 之外。远程服务建议回环监听，通过 SSH 隧道访问，参见[运行手册](docs/OPERATIONS.md)。
+
+创建角色时可选上传头像或参考图。它仅保存在当前浏览器，用于角色展示，不作为生成输入或第二步候选；换浏览器、网址或清除网站数据后不会同步。第二步候选需要连接 ComfyUI 并明确生成，保存聊天模型连接不会开启图像生成。
 
 ## 生成链路
 

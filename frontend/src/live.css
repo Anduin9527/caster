@@ -1,3 +1,47 @@
+.live-workbench .appearance-tags-input {
+  min-height: 120px;
+  text-align: left;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-spacing: normal;
+  letter-spacing: normal;
+  font-weight: 500;
+  line-height: 1.7;
+}
+.character-avatar {
+  display: block;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  background: #f1efe6;
+  border: 2px solid #000;
+  margin-bottom: 12px;
+}
+.character-avatar-preview {
+  display: block;
+  width: 180px;
+  height: 180px;
+  max-width: 100%;
+  object-fit: contain;
+  background: #f1efe6;
+  border: 2px solid #000;
+  margin: 12px 0;
+}
+.candidate-empty {
+  max-width: 680px;
+  padding: 24px;
+  border: 2px dashed var(--line);
+  text-align: left;
+}
+.candidate-empty strong {
+  display: block;
+  color: var(--ink);
+  font-size: 20px;
+}
+.candidate-empty p {
+  margin: 12px 0;
+  line-height: 1.8;
+}
 .live-workbench .topbar {
   display: flex;
   align-items: center;

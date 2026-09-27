@@ -16,6 +16,11 @@ import {
 } from "@phosphor-icons/react";
 import { Modal } from "./components/Modal";
 import { Brand } from "./components/Brand";
+import { appearanceTags } from "./appearanceTags";
+import {
+  CharacterAvatar,
+  CharacterAvatarInput,
+} from "./components/CharacterAvatar";
 import { TemplateDrawer } from "./components/TemplateDrawer";
 const AgentPanel = lazy(() =>
   import("./AgentPanel").then(({ AgentPanel }) => ({ default: AgentPanel })),
@@ -57,7 +62,15 @@ function readDraft(): ServerCharacter {
       Array.isArray(value.fixed_tags) &&
       value.fixed_tags.every((tag: unknown) => typeof tag === "string") &&
       Array.isArray(value.outfits)
-      ? value
+      ? {
+          ...value,
+          fixed_tags:
+            value.fixed_tags.length > 1
+              ? value.fixed_tags
+                  .map((tag: string) => tag.trim())
+                  .filter(Boolean)
+              : value.fixed_tags,
+        }
       : newCharacter();
   } catch {
     return newCharacter();
@@ -99,6 +112,7 @@ export function LiveWorkbench() {
     setChosenMoods,
   } = useWorkbenchPreferences();
   const [draft, setDraft] = useState(readDraft);
+  const [avatarBusy, setAvatarBusy] = useState(false);
   const [canvasPreset, setCanvasPreset] = useState(() => {
     const saved = readPreference("caster-canvas-preset");
     return canvasPresets.some((p) => p.id === saved) ? saved! : "1024x1536";
@@ -1194,6 +1208,7 @@ export function LiveWorkbench() {
                       disabled={busy}
                       onClick={() => setActive(c.id)}
                     >
+                      <CharacterAvatar id={c.id} name={c.name} />
                       <strong>{c.name}</strong>
                       <p>{c.fixed_tags.join("、")}</p>
                       <span>{active === c.id ? "当前角色" : "使用角色"}</span>
@@ -1207,7 +1222,10 @@ export function LiveWorkbench() {
                 >
                   <summary>创建新角色</summary>
                   <div className="disclosure-content">
-                    <button onClick={() => openTemplateDrawer("character")}>
+                    <button
+                      disabled={busy || avatarBusy}
+                      onClick={() => openTemplateDrawer("character")}
+                    >
                       从模板填写
                     </button>
                     <label>
@@ -1222,27 +1240,40 @@ export function LiveWorkbench() {
                     <label>
                       外观标签
                       <textarea
+                        className="appearance-tags-input"
+                        rows={4}
+                        spellCheck={false}
+                        placeholder="用逗号或换行分隔，例如：short hair, blue eyes"
                         value={draft.fixed_tags.join(", ")}
                         onChange={(e) =>
                           setDraft({
                             ...draft,
-                            fixed_tags: e.target.value.split(","),
+                            fixed_tags: [e.target.value],
                           })
                         }
                       />
                     </label>
+                    <CharacterAvatarInput
+                      key={draft.id}
+                      id={draft.id}
+                      disabled={busy}
+                      onBusy={setAvatarBusy}
+                    />
+                    <p className="small muted">
+                      角色名称与标签保存到当前工作台后端；头像参考只保留在此浏览器。
+                    </p>
                     <button
                       className="primary"
-                      disabled={busy || !connected || !draft.name.trim()}
+                      disabled={
+                        busy || avatarBusy || !connected || !draft.name.trim()
+                      }
                       onClick={() =>
                         void act(async (current) => {
                           let saved: ServerCharacter;
                           try {
                             saved = await productionAPI.createCharacter({
                               ...draft,
-                              fixed_tags: draft.fixed_tags
-                                .map((t) => t.trim())
-                                .filter(Boolean),
+                              fixed_tags: appearanceTags(draft.fixed_tags),
                             });
                           } catch (e) {
                             if (
@@ -1255,9 +1286,7 @@ export function LiveWorkbench() {
                             if (!found) throw e;
                             const expected = {
                               ...draft,
-                              fixed_tags: draft.fixed_tags
-                                .map((t) => t.trim())
-                                .filter(Boolean),
+                              fixed_tags: appearanceTags(draft.fixed_tags),
                             };
                             if (
                               found.name !== expected.name ||
@@ -1295,9 +1324,7 @@ export function LiveWorkbench() {
                                   id: crypto.randomUUID(),
                                   kind: "character",
                                   name: draft.name,
-                                  tags: draft.fixed_tags
-                                    .map((t) => t.trim())
-                                    .filter(Boolean),
+                                  tags: appearanceTags(draft.fixed_tags),
                                   description: draft.description,
                                   source: "user",
                                 },
@@ -1372,12 +1399,26 @@ export function LiveWorkbench() {
                   </div>
                 )}
                 {!candidates.length && (
-                  <p className="empty">
-                    还没有候选图片。
-                    {online
-                      ? "选好设定后，点击下方生成。"
-                      : "生成服务开启后即可制作。"}
-                  </p>
+                  <div className="empty candidate-empty" role="status">
+                    <strong>
+                      {step === 1
+                        ? "这个角色还没有生成的候选图"
+                        : "当前选择下还没有候选图"}
+                    </strong>
+                    <p>
+                      {step === 1
+                        ? "选择角色只载入名称与外观标签，不会自动生成图片。模板配图和上传的头像参考不属于候选图。"
+                        : "候选图需要从当前选定的来源图生成。"}
+                    </p>
+                    <p>
+                      {online
+                        ? "确认设定后，点击下方生成按钮制作候选图。"
+                        : "当前未连接图像生成服务（ComfyUI），暂时无法生成。连接聊天模型的 API 不会开启图像生成服务。"}
+                    </p>
+                    {step === 1 && (
+                      <button onClick={() => go(0)}>返回角色设定</button>
+                    )}
+                  </div>
                 )}
               </>
             ) : step === 4 ? (
