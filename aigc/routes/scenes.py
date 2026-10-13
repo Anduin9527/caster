@@ -5,6 +5,7 @@ from collections.abc import Callable
 
 from fastapi import APIRouter, HTTPException
 
+from ..http_contracts import CharacterRecord
 from ..llm import parse_scene
 from ..schema import Character, PoseState, SceneRequest, SceneSpec
 from ..store import Store
@@ -14,7 +15,12 @@ from .common import required, validate_spec
 def scenes_router(get_store: Callable[[], Store], config: dict[str, str]) -> APIRouter:
     router = APIRouter(tags=["Scenes"])
 
-    @router.post("/characters", status_code=201)
+    @router.post(
+        "/characters",
+        status_code=201,
+        response_model_exclude_unset=True,
+        response_model=CharacterRecord,
+    )
     async def create_character(body: Character):
         store = get_store()
         try:
@@ -24,12 +30,16 @@ def scenes_router(get_store: Callable[[], Store], config: dict[str, str]) -> API
                 409, "Character exists; immutable identity requires a new character ID"
             )
 
-    @router.get("/characters")
+    @router.get(
+        "/characters", response_model_exclude_unset=True, response_model=list[CharacterRecord]
+    )
     async def characters():
         store = get_store()
         return store.list("character")
 
-    @router.get("/characters/{id}")
+    @router.get(
+        "/characters/{id}", response_model_exclude_unset=True, response_model=CharacterRecord
+    )
     async def character(id: str):
         store = get_store()
         return required(store, "character", id)

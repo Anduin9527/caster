@@ -1,12 +1,8 @@
 import { parseBundle, uid, type Character, type Template } from "./model";
 
-export type ServerCharacter = {
-  id: string;
-  name: string;
-  fixed_tags: string[];
-  description?: string;
-  outfits: { id: string; tags: string[]; description?: string }[];
-};
+import { createHTTPClient } from "./api/http";
+import type { components } from "./api/schema";
+export type ServerCharacter = components["schemas"]["CharacterRecord"];
 
 // Template catalog access is independent of production task polling.
 export function createLibrary(fetcher: typeof fetch = fetch) {
@@ -23,29 +19,14 @@ export function createLibrary(fetcher: typeof fetch = fetch) {
       };
     }
   >();
-  async function request(path: string, init?: RequestInit) {
-    const r = await fetcher(`/api${path}`, {
-      ...init,
-      signal: init?.signal
-        ? AbortSignal.any([init.signal, AbortSignal.timeout(60000)])
-        : AbortSignal.timeout(60000),
-    });
-    if (!r.ok) {
-      let detail = "";
-      try {
-        detail = JSON.stringify((await r.json()).detail || "");
-      } catch {
-        /* non-JSON gateway error */
-      }
-      throw Error(
-        `后端请求失败（${r.status}）${detail}。请检查 SSH 隧道与服务。`,
-      );
-    }
+  const http = createHTTPClient(fetcher);
+  async function request<T>(path: string, init?: RequestInit): Promise<T> {
+    const data = await http.request<T>(path, { cache: "default", ...init }, 60000);
     if (init?.method && init.method !== "GET") {
       revision += 1;
       pages.clear();
     }
-    return r.json();
+    return data;
   }
   return {
     async page(
@@ -68,7 +49,12 @@ export function createLibrary(fetcher: typeof fetch = fetch) {
       const cached = pages.get(key);
       if (cached && cached.expires > Date.now()) return cached.data;
       const started = revision;
-      const data = await request(`/prompt-templates?${params}`, { signal });
+      const data = await request<{
+        total: number;
+        categories: string[];
+        category_labels?: Record<string, string>;
+        items: Template[];
+      }>(`/prompt-templates?${params}`, { signal });
       const result = {
         total: data.total as number,
         categories: data.categories as string[],
@@ -92,7 +78,7 @@ export function createLibrary(fetcher: typeof fetch = fetch) {
       );
     },
     async characters(signal?: AbortSignal): Promise<ServerCharacter[]> {
-      const rows = await request("/characters", { signal });
+      const rows = await request<ServerCharacter[]>("/characters", { signal });
       if (
         !Array.isArray(rows) ||
         rows.some(
@@ -126,11 +112,14 @@ export function createLibrary(fetcher: typeof fetch = fetch) {
       return request("/prompt-templates/import", { method: "POST", body });
     },
     async edit(t: Template) {
-      return request(`/prompt-templates/${encodeURIComponent(t.id)}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify((({ display, ...original }) => original)(t)),
-      });
+      return request<Template>(
+        `/prompt-templates/${encodeURIComponent(t.id)}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify((({ display, ...original }) => original)(t)),
+        },
+      );
     },
   };
 }

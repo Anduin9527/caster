@@ -2,7 +2,7 @@ import { mkdir, copyFile, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 const root = fileURLToPath(new URL("../../", import.meta.url));
-const dest = path.join(root, "frontend/public/demo-assets");
+const dest = fileURLToPath(new URL("../public/demo-assets", import.meta.url));
 await mkdir(dest, { recursive: true });
 const map = {
   "identity.png": "demo-b-baseline-v1-original-0.png",

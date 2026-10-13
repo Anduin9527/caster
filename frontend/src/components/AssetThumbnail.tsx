@@ -1,3 +1,4 @@
+import { apiURL } from "../api/http";
 import type { ImgHTMLAttributes } from "react";
 
 export function AssetThumbnail({
@@ -8,7 +9,7 @@ export function AssetThumbnail({
   assetId: string;
   alt: string;
 }) {
-  const url = `/api/assets/${encodeURIComponent(assetId)}/thumbnail`;
+  const url = apiURL(`/assets/${encodeURIComponent(assetId)}/thumbnail`);
   return (
     <img
       loading="lazy"

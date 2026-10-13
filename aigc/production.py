@@ -7,6 +7,16 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import Field
 
 from . import pose_presets, pose_studio_presets
+from .http_contracts import (
+    Capabilities,
+    OutfitVersionRecord,
+    PoseRecord,
+    ProductionBatch,
+    ProductionPreset,
+    ProductionSelection,
+    ProductionSnapshot,
+    ReviewRecord,
+)
 from .schema import Outfit
 from .workbench import (
     BatchRequest,
@@ -28,7 +38,7 @@ class OutfitVersion(Outfit):
 def production_router(get_store, get_comfy=None):
     router = APIRouter(prefix="/production", tags=["production"])
 
-    @router.get("/capabilities")
+    @router.get("/capabilities", response_model_exclude_unset=True, response_model=Capabilities)
     async def capabilities():
         online = False
         if get_comfy:
@@ -46,7 +56,7 @@ def production_router(get_store, get_comfy=None):
             "pose_input": "pose_studio_3d",
         }
 
-    @router.get("/snapshot")
+    @router.get("/snapshot", response_model_exclude_unset=True, response_model=ProductionSnapshot)
     def snapshot(character_id: str | None = None):
         store = get_store()
         # One SQLite read transaction prevents jobs, outputs and approvals from
@@ -155,7 +165,12 @@ def production_router(get_store, get_comfy=None):
             ],
         }
 
-    @router.post("/characters/{character_id}/outfits", status_code=201)
+    @router.post(
+        "/characters/{character_id}/outfits",
+        status_code=201,
+        response_model_exclude_unset=True,
+        response_model=OutfitVersionRecord,
+    )
     def create_outfit(character_id: str, body: OutfitVersion):
         try:
             return get_store().append_outfit(
@@ -179,19 +194,36 @@ def production_router(get_store, get_comfy=None):
         except ValueError as e:
             raise HTTPException(422, str(e))
 
-    @router.get("/characters/{character_id}/selection")
+    @router.get(
+        "/characters/{character_id}/selection",
+        response_model_exclude_unset=True,
+        response_model=ProductionSelection,
+    )
     def read_selection(character_id: str):
         return invoke(get_selection, character_id)
 
-    @router.put("/characters/{character_id}/selection")
+    @router.put(
+        "/characters/{character_id}/selection",
+        response_model_exclude_unset=True,
+        response_model=ProductionSelection,
+    )
     def update_selection(character_id: str, body: SelectionRequest):
         return invoke(select_image, character_id, body)
 
-    @router.post("/characters/{character_id}/batches", status_code=201)
+    @router.post(
+        "/characters/{character_id}/batches",
+        status_code=201,
+        response_model_exclude_unset=True,
+        response_model=ProductionBatch,
+    )
     def submit_batch(character_id: str, body: BatchRequest):
         return invoke(create_batch, character_id, body)
 
-    @router.put("/characters/{character_id}/assets/{asset_id}/review")
+    @router.put(
+        "/characters/{character_id}/assets/{asset_id}/review",
+        response_model_exclude_unset=True,
+        response_model=ReviewRecord,
+    )
     def review(character_id: str, asset_id: str, body: ReviewRequest):
         return invoke(review_image, character_id, asset_id, body)
 
@@ -202,7 +234,9 @@ def production_router(get_store, get_comfy=None):
             headers={"Content-Disposition": 'attachment; filename="caster-assets.json"'},
         )
 
-    @router.get("/pose-presets")
+    @router.get(
+        "/pose-presets", response_model_exclude_unset=True, response_model=list[ProductionPreset]
+    )
     def list_presets():
         return pose_studio_presets.catalog()
 
@@ -222,7 +256,12 @@ def production_router(get_store, get_comfy=None):
         except ValueError as e:
             raise HTTPException(422, str(e))
 
-    @router.post("/pose-presets/{index}", status_code=201)
+    @router.post(
+        "/pose-presets/{index}",
+        status_code=201,
+        response_model_exclude_unset=True,
+        response_model=PoseRecord,
+    )
     def save_preset(index: int, width: int | None = None, height: int | None = None):
         if index >= 101:
             return invoke(pose_studio_presets.materialize, index, width, height)

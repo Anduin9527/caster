@@ -1,5 +1,5 @@
 import type { MouseEventHandler } from "react";
-import banner from "../../../docs/images/caster-pixel-banner.png";
+import banner from "../assets/caster-pixel-banner.png";
 
 export function Brand({
   onClick,

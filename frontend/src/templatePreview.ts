@@ -1,4 +1,5 @@
-import outfitPreviews from "../../integrations/anima-outfit-previews.json";
+import { apiURL } from "./api/http";
+import outfitPreviews from "./data/anima-outfit-previews.json";
 import type { Template } from "./model";
 
 // Matches getCharacterImageUrl in the pinned Anima Tools Hub, and clothing_data.js.
@@ -18,8 +19,11 @@ export function templateSource(t: Template): string | undefined {
 }
 
 export function templatePreview(t: Template): string | undefined {
-  const generated = t.kind === "outfit" && t.source === "caster://curated-outfits-v1";
+  const generated =
+    t.kind === "outfit" && t.source === "caster://curated-outfits-v1";
   if (!generated && !templateSource(t)) return;
   const version = encodeURIComponent(`${t.source_revision}:${t.source_key}`);
-  return `/api/prompt-templates/${encodeURIComponent(t.id)}/image?v=${version}`;
+  return apiURL(
+    `/prompt-templates/${encodeURIComponent(t.id)}/image?v=${version}`,
+  );
 }

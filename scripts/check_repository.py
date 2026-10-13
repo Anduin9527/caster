@@ -61,7 +61,9 @@ def main() -> int:
     files = {name for name in output.decode().split("\0") if name and (ROOT / name).is_file()}
     problems = []
     for name in sorted(files):
-        if name != ".env.example" and any(fnmatch.fnmatch(name, p) for p in PRIVATE_PATTERNS):
+        if Path(name).name != ".env.example" and any(
+            fnmatch.fnmatch(name, p) for p in PRIVATE_PATTERNS
+        ):
             problems.append(f"Runtime/private artifact in source: {name}")
         if not name.endswith(".md"):
             continue

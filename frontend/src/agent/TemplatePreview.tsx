@@ -1,8 +1,9 @@
+import { apiURL } from "../api/http";
 import { useState } from "react";
 
 function localTemplatePreview(value?: string | null) {
   if (!value?.startsWith("/prompt-templates/")) return "";
-  return "/api" + value;
+  return apiURL(value);
 }
 
 export function TemplatePreview({

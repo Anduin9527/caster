@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/caster-pixel-banner.png" alt="CASTER 像素横幅：从角色到动作与表情" width="100%" />
+  <img src="frontend/src/assets/caster-pixel-banner.png" alt="CASTER 像素横幅：从角色到动作与表情" width="100%" />
 </p>
 
 <h1 align="center">CASTER</h1>
@@ -128,14 +128,16 @@ npm run dev
 
 ## 开发与扩展
 
-前端通过 `/api` 访问 FastAPI。后端保存角色、资产来源、授权快照和任务；Agent 准备计划，ComfyUI 执行已批准的生成。任务提交后记录 prompt ID，恢复时先核对执行结果。
+前端使用 React 19、TypeScript、Vite 与 TanStack Query，通过 `/api/v1` 访问 FastAPI。
+两端可独立构建与部署；工作台数据类型由后端 OpenAPI 生成。后端保存角色、资产来源、授权快照和任务；
+Agent 准备计划，ComfyUI 执行已批准的生成。任务提交后记录 prompt ID，恢复时先核对执行结果。
 
 ```text
 aigc/
 ├── agent/         # LlamaIndex、受限工具、会话与审批
 ├── routes/        # HTTP 路由
 └── …              # 任务、资产、提示词、配置与 RAG
-frontend/          # React 工作台与前端演示
+frontend/          # 可独立构建的 React 工作台、API 契约与前端演示
 workflows/         # ComfyUI API 图、可视图与参数绑定
 custom_nodes/      # 局部编辑节点及可选控制节点
 integrations/      # 资源来源、版本与画布预设
@@ -153,7 +155,9 @@ make setup
 make check
 ```
 
-`make check` 包含静态与格式检查、后端测试、前端测试、类型检查和构建。GitHub CI 自动执行仓库检查；通过 CI 不代表真实模型或 GPU 图像质量已经验收。
+`make check` 包含静态与格式检查、后端测试、前端测试、API 契约一致性、类型检查和构建。
+接口修改后运行 `make contracts`，一并提交生成的契约与类型。独立部署说明见[前端文档](frontend/README.md)。
+GitHub CI 自动执行仓库检查；通过 CI 不代表真实模型或 GPU 图像质量已经验收。
 
 - [系统架构](docs/ARCHITECTURE.md)：Agent、RAG、审批与恢复边界。
 - [贡献指南](CONTRIBUTING.md)：开发流程、验证和仓库文件约定。

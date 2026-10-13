@@ -1,3 +1,4 @@
+import { APIError, createHTTPClient } from "./api/http";
 export type AgentProvider = {
   id: string;
   label: string;
@@ -258,45 +259,22 @@ export function formatAgentError(error: unknown): string {
   return message || "助手没有完成这一轮。";
 }
 
-export class AgentAPIError extends Error {
-  constructor(
-    message: string,
-    public status?: number,
-  ) {
-    super(message);
-  }
-}
+export class AgentAPIError extends APIError {}
 
 export function createAgentAPI(fetcher: typeof fetch = fetch) {
+  const http = createHTTPClient(fetcher);
   async function request<T>(
     path: string,
     init?: RequestInit,
     timeout = 20000,
   ): Promise<T> {
-    const response = await fetcher("/api/agent" + path, {
-      ...init,
-      headers: {
-        ...(init?.body ? { "Content-Type": "application/json" } : {}),
-        ...(init?.headers || {}),
-      },
-      signal: init?.signal
-        ? AbortSignal.any([init.signal, AbortSignal.timeout(timeout)])
-        : AbortSignal.timeout(timeout),
-      cache: init?.method ? undefined : "no-store",
-    });
-    if (!response.ok) {
-      let detail = "";
-      try {
-        detail = String((await response.json()).detail || "");
-      } catch {
-        /* gateway response */
-      }
-      throw new AgentAPIError(
-        detail || "助手请求未完成（" + response.status + "）",
-        response.status,
-      );
+    try {
+      return await http.request<T>("/agent" + path, init, timeout);
+    } catch (error) {
+      if (error instanceof APIError)
+        throw new AgentAPIError(error.message, error.status, error.detail);
+      throw error;
     }
-    return response.json();
   }
 
   return {
@@ -403,10 +381,12 @@ export function createAgentAPI(fetcher: typeof fetch = fetch) {
         { method: "POST", body: "{}" },
       ),
     eventURL: (conversationId: string, after = "") =>
-      "/api/agent/conversations/" +
-      encodeURIComponent(conversationId) +
-      "/events" +
-      (after ? "?after=" + encodeURIComponent(after) : ""),
+      http.url(
+        "/agent/conversations/" +
+          encodeURIComponent(conversationId) +
+          "/events" +
+          (after ? "?after=" + encodeURIComponent(after) : ""),
+      ),
   };
 }
 

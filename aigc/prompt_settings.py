@@ -11,6 +11,7 @@ from fastapi import APIRouter
 from pydantic import Field
 
 from .anima_defaults import DEFAULT_ARTIST_STYLE, DEFAULT_FIXED_NEGATIVE, DEFAULT_FIXED_POSITIVE
+from .http_contracts import PromptSettings
 from .schema import Strict
 
 PromptText = Annotated[str, Field(max_length=12000)]
@@ -66,11 +67,11 @@ def save_prompt_settings(store, body: PromptSettingsUpdate) -> dict:
 def prompt_settings_router(get_store):
     router = APIRouter(prefix="/prompt-settings", tags=["Prompt settings"])
 
-    @router.get("")
+    @router.get("", response_model_exclude_unset=True, response_model=PromptSettings)
     def read_prompt_settings():
         return get_prompt_settings(get_store())
 
-    @router.put("")
+    @router.put("", response_model_exclude_unset=True, response_model=PromptSettings)
     def write_prompt_settings(body: PromptSettingsUpdate):
         return save_prompt_settings(get_store(), body)
 

@@ -4,8 +4,35 @@ import json
 import os
 import shlex
 from pathlib import Path
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def cors_origins(values: dict[str, str]) -> list[str]:
+    """Cross-origin UI access is opt-in and limited to exact HTTP origins."""
+    origins = []
+    for item in values.get("AIGC_CORS_ORIGINS", "").split(","):
+        origin = item.strip().rstrip("/")
+        if not origin:
+            continue
+        url = urlsplit(origin)
+        if (
+            url.scheme not in ("http", "https")
+            or not url.hostname
+            or url.username is not None
+            or url.password is not None
+            or url.path
+            or url.query
+            or url.fragment
+            or "*" in origin
+        ):
+            raise ValueError("AIGC_CORS_ORIGINS expects comma-separated HTTP origins")
+        # Validate ports even though no connection is made at configuration time.
+        _ = url.port
+        if origin not in origins:
+            origins.append(origin)
+    return origins
 
 
 def flag(values, key, default=False):
@@ -26,6 +53,7 @@ def load(path=None):
         "AIGC_API_URL": "http://127.0.0.1:8189",
         "AIGC_COMFY_URL": "http://127.0.0.1:8188",
         "AIGC_UI_URL": "http://127.0.0.1:4173",
+        "AIGC_CORS_ORIGINS": "",
         "AIGC_DATA_DIR": str(ROOT / "data"),
         # Semantic (vector) retrieval. Empty AIGC_RAG_DIR means the index is not
         # deployed and retrieval reports semantic search as unavailable instead

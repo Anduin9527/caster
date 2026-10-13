@@ -27,7 +27,10 @@ test("live library reads through same-origin API; server identity creates isolat
   }) as typeof fetch);
   assert.equal((await api.templates()).length, 1);
   assert.equal((await api.characters())[0].id, "demo-b");
-  assert.deepEqual(calls, ["/api/prompt-templates/export", "/api/characters"]);
+  assert.deepEqual(calls, [
+    "/api/v1/prompt-templates/export",
+    "/api/v1/characters",
+  ]);
   const draft = characterDraft(character);
   assert.notEqual(draft.id, character.id);
   assert.equal(draft.sourceId, character.id);
@@ -38,7 +41,7 @@ test("live library reads through same-origin API; server identity creates isolat
 });
 test("template writes use backend endpoints and propagate conflicts, never simulate success", async () => {
   const api = createLibrary((async (url: string, init: RequestInit) => {
-    assert.ok(url.startsWith("/api/prompt-templates"));
+    assert.ok(url.startsWith("/api/v1/prompt-templates"));
     assert.ok(["POST", "PUT"].includes(init.method!));
     return Response.json({ detail: "Template exists" }, { status: 409 });
   }) as typeof fetch);

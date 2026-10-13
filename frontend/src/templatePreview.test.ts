@@ -33,13 +33,22 @@ test("preview mapping follows upstream source key, not editable display name", (
 
 test("template images use only the same-origin backend cache", () => {
   const url = templatePreview(base)!;
-  assert.ok(url.startsWith('/api/prompt-templates/a/image?v='));
-  assert.ok(!url.includes('https://'));
-  assert.notEqual(url, templatePreview({...base,source_key:'another||series'}));
+  assert.ok(url.startsWith("/api/v1/prompt-templates/a/image?v="));
+  assert.ok(!url.includes("https://"));
+  assert.notEqual(
+    url,
+    templatePreview({ ...base, source_key: "another||series" }),
+  );
 });
 
 test("curated outfit images use the backend without inventing an upstream URL", () => {
-  const curated = {...base, kind: "outfit" as const, source: "caster://curated-outfits-v1"};
+  const curated = {
+    ...base,
+    kind: "outfit" as const,
+    source: "caster://curated-outfits-v1",
+  };
   assert.equal(templateSource(curated), undefined);
-  assert.ok(templatePreview(curated)?.startsWith('/api/prompt-templates/a/image?v='));
+  assert.ok(
+    templatePreview(curated)?.startsWith("/api/v1/prompt-templates/a/image?v="),
+  );
 });

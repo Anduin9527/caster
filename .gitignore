@@ -50,11 +50,14 @@ tests-result.txt
 /workflows/*.probe.json
 /workflows/*.metrics.json
 /frontend/node_modules/
+/frontend/tools/*/node_modules/
 /frontend/dist/
 /frontend/public/demo-assets/
 /frontend/qa/
 !/frontend/src/data/
 !/frontend/src/data/poses.json
+!/frontend/src/data/canvas-presets.json
+!/frontend/src/data/anima-outfit-previews.json
 
 # Server-only operational files
 /backups/

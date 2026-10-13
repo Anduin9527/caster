@@ -105,10 +105,10 @@ test("agent adapter carries the exact workbench context and idempotency key", as
   await api.settings();
   await api.send("conversation/一", "猫耳加异色瞳", context, "request-1");
 
-  assert.equal(calls[0].url, "/api/agent/settings");
+  assert.equal(calls[0].url, "/api/v1/agent/settings");
   assert.equal(
     calls[1].url,
-    "/api/agent/conversations/conversation%2F%E4%B8%80/messages",
+    "/api/v1/agent/conversations/conversation%2F%E4%B8%80/messages",
   );
   assert.equal(calls[1].method, "POST");
   assert.deepEqual(calls[1].body, {
@@ -132,7 +132,7 @@ test("conversation can be rebound without opening a replacement session", async 
   await api.rebindConversation("conversation/1", "luo-tianyi");
 
   assert.deepEqual(calls[0], {
-    url: "/api/agent/conversations/conversation%2F1/character",
+    url: "/api/v1/agent/conversations/conversation%2F1/character",
     method: "PUT",
     body: { character_id: "luo-tianyi" },
   });
@@ -173,7 +173,7 @@ test("workbench approval sends only the content-bound card hash", async () => {
   await api.approveWorkbenchChange(change);
 
   assert.deepEqual(call, {
-    url: "/api/agent/workbench-changes/change%2F%E4%B8%80/approve",
+    url: "/api/v1/agent/workbench-changes/change%2F%E4%B8%80/approve",
     body: { content_hash: "b".repeat(64) },
   });
 });

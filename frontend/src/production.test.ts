@@ -23,7 +23,7 @@ test("production reads never write, infer approvals or fall back to demo", async
   const result = await api.snapshot("a");
   assert.equal(result.jobs[0].state, "submission_uncertain");
   assert.equal(result.approvals.length, 0);
-  assert.equal(calls[0], "/api/production/snapshot?character_id=a");
+  assert.equal(calls[0], "/api/v1/production/snapshot?character_id=a");
   await assert.rejects(() => api.snapshot("b"), /格式不兼容/);
   const offline = createProductionAPI(
     (async () => new Response("", { status: 503 })) as typeof fetch,
@@ -42,7 +42,7 @@ test("progress uses observed values and never invents percent; download stays on
     undefined,
   );
   assert.equal(productionProgress({ ...job, state: "succeeded" }), 100);
-  assert.equal(productionAssetURL("a/b"), "/api/assets/a%2Fb/file");
+  assert.equal(productionAssetURL("a/b"), "/api/v1/assets/a%2Fb/file");
 });
 
 test("production writes explicit revisions and preserves the batch key for recovery", async () => {
@@ -105,10 +105,16 @@ test("ComfyUI websocket progress envelope is mapped without invented progress", 
 });
 
 test("native pose requests carry the selected source resolution", async () => {
-  let called="";
-  const api=createProductionAPI((async (url)=>{called=String(url);return Response.json({id:"native",render_asset_id:"render"});}) as typeof fetch);
-  await api.savePreset(105,768,1152);
-  assert.equal(called,"/api/production/pose-presets/105?width=768&height=1152");
+  let called = "";
+  const api = createProductionAPI((async (url) => {
+    called = String(url);
+    return Response.json({ id: "native", render_asset_id: "render" });
+  }) as typeof fetch);
+  await api.savePreset(105, 768, 1152);
+  assert.equal(
+    called,
+    "/api/v1/production/pose-presets/105?width=768&height=1152",
+  );
 });
 
 test("prompt preferences use a dedicated read/write settings endpoint", async () => {
@@ -123,7 +129,8 @@ test("prompt preferences use a dedicated read/write settings endpoint", async ()
   };
   const api = createProductionAPI((async (url, init) => {
     calls.push({
-      url: String(url), method: init?.method,
+      url: String(url),
+      method: init?.method,
       body: init?.body ? JSON.parse(String(init.body)) : undefined,
     });
     return Response.json(value);
@@ -137,9 +144,10 @@ test("prompt preferences use a dedicated read/write settings endpoint", async ()
   });
 
   assert.deepEqual(calls, [
-    { url: "/api/prompt-settings", method: undefined, body: undefined },
+    { url: "/api/v1/prompt-settings", method: undefined, body: undefined },
     {
-      url: "/api/prompt-settings", method: "PUT",
+      url: "/api/v1/prompt-settings",
+      method: "PUT",
       body: {
         artist_style: "@rella",
         fixed_positive: "masterpiece, safe",

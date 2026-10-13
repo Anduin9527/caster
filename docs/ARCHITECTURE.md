@@ -3,6 +3,31 @@
 CASTER 是一个单用户、回环部署的角色资产制作工作台。React 前端负责分步制作与人工审批，
 FastAPI + SQLite 保存模板、角色、资产、计划和任务，ComfyUI 只负责执行已经批准的生成工作流。
 
+## 前后端分离
+
+- 前端：React 19 + TypeScript + Vite。TanStack Query 管理角色目录、按角色隔离的制作快照、
+  能力状态、姿态目录和提示词设置；草稿、选图偏好和待核对的提交意图继续使用各自的浏览器持久化。
+- 后端：FastAPI + Pydantic 2。原生提供 `/api/v1`，开发代理与部署代理均保留完整路径，
+  无需删除 `/api` 前缀。旧无前缀路径保留兼容，公开 OpenAPI 只描述版本化接口。
+- 契约：`aigc/http_contracts.py` 描述工作台读模型，输入继续使用领域模型。
+  `scripts/export_openapi.py` 在不启动服务、不读运行数据的情况下导出 `frontend/openapi.json`；
+  openapi-typescript 生成 `frontend/src/api/schema.d.ts`，工作台直接引用这些类型。
+  Agent 的动态事件展示类型仍由助手模块维护，未宣称所有历史接口都具有完整响应模型。
+- 传输：`frontend/src/api/http.ts` 统一根地址、超时、取消与 HTTP 错误。
+  JSON、SSE、缩略图、原图、模板预览、姿态图片和清单下载均通过同一地址配置。
+  `VITE_API_BASE_URL` 可设置为同源路径或绝对 URL；跨域时后端只允许 `AIGC_CORS_ORIGINS` 列出的精确 origin。
+- 构建：`frontend/` 自带品牌图片和生成的只读目录副本，不直接导入仓库外层的后端、文档或资源文件。
+  只读目录源仍为 `integrations/`，`make contracts` 同步副本，CI 检查内容一致。
+  OpenAPI 生成工具使用独立 npm workspace，锁定其需要的 TypeScript 5，应用保持 TypeScript 7。
+
+前端构建产物为 `frontend/dist/client/`，可以作为静态文件独立托管。后端不承担 SPA 文件服务，
+两端通过 HTTP/SSE 协作；部署与回滚无需复制数据库或生成资产。CORS 仅用于跨域访问配置，
+系统仍按单用户回环部署设计，不增加账号隔离或公开互联网访问授权。
+
+实现依据：[TanStack Query 的请求取消](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation)、
+[查询默认行为](https://tanstack.com/query/latest/docs/framework/react/guides/important-defaults)、
+[OpenAPI TypeScript](https://openapi-ts.dev/cli)、[FastAPI CORS](https://fastapi.tiangolo.com/tutorial/cors/)。
+
 ## 模块与资源生命周期
 
 `aigc.api.create_app()` 组装应用；保留 `aigc.api:app` 部署入口。应用导入或生成 OpenAPI 时不创建数据库、
@@ -21,6 +46,8 @@ HTTP 客户端或 worker。每个应用实例使用自己的配置、Store、Age
 | `aigc/store.py` | SQLite 事务与持久化；事务结束时关闭连接 |
 | `aigc/rag*.py` | 查询、编码器、索引指纹与 Wiki 正文目录 |
 | `frontend/src/agent/` | 会话请求与事件流生命周期、连接设置、证据、工具轨迹与审批卡 |
+| `frontend/src/api/` | 统一 HTTP 传输、地址处理与生成的契约类型 |
+| `frontend/src/workbench/` | 查询键、缓存、轮询、请求取消与服务端数据钩子 |
 | `frontend/src/workbenchPreferences.ts` | 随角色一次切换的制作偏好与持久化 |
 
 路由通过工厂取得应用资源；测试注入临时 Store 和离线适配器，不替换进程级数据库全局变量。
@@ -65,7 +92,9 @@ HTTP 请求共享本应用的 AgentEngine；不同应用不共享运行任务。
 不自动重发结果不确定的请求。关闭助手界面不会取消已经批准的制作任务。
 
 角色偏好与角色 ID 在一次状态更新中切换；模板写入会使分页缓存失效，旧请求不能重新填入缓存。
-工作台轮询在前次请求结束后再安排下一轮，切换或关闭时取消读请求。制作提交日志独立于可选偏好：
+工作台的同键查询复用请求，快照按角色隔离，切换或关闭时取消读请求；隐藏页暂停轮询，恢复可见后刷新。
+快照和在线能力每 5 秒刷新，姿态目录缓存 5 分钟；写入成功后使相关查询失效。查询和写入均不自动重试。
+制作提交日志独立于可选偏好：
 保存恢复所需的原始请求失败时，不发起生成提交。
 
 前端区分两种意图：
@@ -127,5 +156,8 @@ draft → awaiting_approval → queued → running → succeeded / failed
 ```bash
 make check
 ```
+
+修改 API 或共享目录后先执行 `make contracts`。后端检查导出契约是否漂移；前端独立检查
+生成类型与契约一致，不安装 Python。完整响应模型只覆盖上文列出的工作台接口，新增类型应从后端模型扩展。
 
 单元测试不替代真实模型响应质量或生成图片质量验收。

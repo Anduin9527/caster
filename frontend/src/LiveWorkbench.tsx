@@ -1,7 +1,9 @@
+import { apiURL } from "./api/http";
+import { useWorkbenchData } from "./workbench/useWorkbenchData";
 import { useWorkbenchPreferences } from "./workbenchPreferences";
 import { readPreference, writePreference } from "./storage";
 import { useStepNavigation } from "./useStepNavigation";
-import canvasPresets from "../../integrations/canvas-presets.json";
+import canvasPresets from "./data/canvas-presets.json";
 import { expressionLabel, assetTypeLabel, jobErrorLabel } from "./presentation";
 import { Select } from "./Select";
 import { useEffect, useState, useRef, lazy, Suspense } from "react";
@@ -36,13 +38,10 @@ import {
   productionStateNames,
   productionProgress,
   ProductionError,
-  type ProductionSnapshot,
   type ProductionSelection,
   type ProductionAsset,
   type ProductionBatchRequest,
   type ProductionBatch,
-  type ProductionPreset,
-  type PromptSettings,
   type PromptSettingsInput,
 } from "./production";
 import "./live.css";
@@ -98,7 +97,6 @@ function readIntent(id: string): ProductionBatchRequest | null {
 }
 
 export function LiveWorkbench() {
-  const [characters, setCharacters] = useState<ServerCharacter[]>([]);
   const [characterQuery, setCharacterQuery] = useState("");
   const {
     active,
@@ -126,9 +124,22 @@ export function LiveWorkbench() {
   );
   const [characterFormOpen, setCharacterFormOpen] = useState(false);
   const stepsNav = useStepNavigation(step);
-  const [snapshot, setSnapshot] = useState<ProductionSnapshot | null>(null);
+  const {
+    characters,
+    charactersLoaded,
+    setCharacters,
+    snapshot,
+    connected,
+    online,
+    error,
+    presets,
+    presetError,
+    promptSettings,
+    promptSettingsError,
+    setPromptSettings,
+    refresh,
+  } = useWorkbenchData(active);
   const catalog: Template[] = [];
-  const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
@@ -144,44 +155,27 @@ export function LiveWorkbench() {
     },
     [],
   );
-  const [revision, setRevision] = useState(0);
-  const [connected, setConnected] = useState(false);
-  const [online, setOnline] = useState(false);
   const [drawer, setDrawer] = useState<"character" | "outfit" | null>(null);
   function openTemplateDrawer(kind: "character" | "outfit") {
     setDrawer(kind);
   }
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [promptSettings, setPromptSettings] = useState<PromptSettings | null>(
-    null,
-  );
   const [promptDraft, setPromptDraft] = useState<PromptSettingsInput | null>(
     null,
   );
   const [promptSettingsBusy, setPromptSettingsBusy] = useState(false);
   const [promptSettingsMessage, setPromptSettingsMessage] = useState("");
   useEffect(() => {
-    let live = true;
-    const controller = new AbortController();
-    productionAPI
-      .promptSettings(controller.signal)
-      .then((value) => {
-        if (!live) return;
-        setPromptSettings(value);
-        setPromptDraft({
-          artist_style: value.artist_style,
-          fixed_positive: value.fixed_positive,
-          fixed_negative: value.fixed_negative,
-        });
-      })
-      .catch((reason) => {
-        if (live) setPromptSettingsMessage((reason as Error).message);
+    if (promptSettings)
+      setPromptDraft({
+        artist_style: promptSettings.artist_style,
+        fixed_positive: promptSettings.fixed_positive,
+        fixed_negative: promptSettings.fixed_negative,
       });
-    return () => {
-      live = false;
-      controller.abort();
-    };
-  }, []);
+  }, [promptSettings]);
+  useEffect(() => {
+    if (promptSettingsError) setPromptSettingsMessage(promptSettingsError);
+  }, [promptSettingsError]);
   const [tasksOpen, setTasksOpen] = useState(false);
   const [agentOpen, setAgentOpen] = useState(false);
   const [wideScreen, setWideScreen] = useState(
@@ -199,8 +193,6 @@ export function LiveWorkbench() {
     tags: string;
     parent_id?: string;
   } | null>(null);
-  const [presets, setPresets] = useState<ProductionPreset[]>([]);
-  const [presetError, setPresetError] = useState("");
   const [customMood, setCustomMood] = useState("");
   const [lightbox, setLightbox] = useState<ProductionAsset | null>(null);
   const [pending, setPending] = useState<ProductionBatchRequest | null>(() =>
@@ -241,7 +233,7 @@ export function LiveWorkbench() {
   };
   const assets = data?.assets || [];
   const selectedImage = (id: string | null) => assets.find((a) => a.id === id);
-  const outfitName = (id?: string) =>
+  const outfitName = (id?: string | null) =>
     data?.outfit_versions?.find((o) => o.id === id)?.name || "基础服装";
   const expressionName = (prompt?: string) =>
     expressionLabel(prompt, expressions);
@@ -276,7 +268,7 @@ export function LiveWorkbench() {
         focus
       ];
       setActive(characterId, requestedStep);
-      setRevision((value) => value + 1);
+      void refresh();
       setNotice(
         focus === "identity"
           ? "已切换到新角色，下一步是确认身份图。"
@@ -297,82 +289,21 @@ export function LiveWorkbench() {
     setCorrection(null);
   }, [active]);
   useEffect(() => {
-    let live = true;
-    const controller = new AbortController();
-    serverLibrary
-      .characters(controller.signal)
-      .then((rows) => {
-        if (!live) return;
-        setCharacters(rows);
-        setActive((old) =>
-          rows.some((c) => c.id === old) ? old : rows[0]?.id || "",
-        );
-      })
-      .catch((e) => live && setError(e.message));
-    return () => {
-      live = false;
-      controller.abort();
-    };
-  }, []);
+    if (charactersLoaded)
+      setActive((old) =>
+        characters.some((character) => character.id === old)
+          ? old
+          : characters[0]?.id || "",
+      );
+  }, [characters, charactersLoaded]);
   useEffect(() => {
-    let live = true;
-    let timer: ReturnType<typeof setTimeout>;
-    const controller = new AbortController();
-    setConnected(false);
-
-    async function load() {
-      try {
-        const [cap, snap] = await Promise.all([
-          productionAPI.capabilities(controller.signal),
-          active
-            ? productionAPI.snapshot(active, controller.signal)
-            : Promise.resolve(null),
-        ]);
-        if (!live) return;
-        setConnected(Boolean(cap.selection && cap.batches));
-        setOnline(cap.generation_online);
-        await productionAPI
-          .presets(controller.signal)
-          .then((rows) => {
-            if (live) {
-              const studio = rows.filter((p) => p.format === "pose_studio_3d");
-              setPresets(studio);
-              setPresetError(
-                studio.length ? "" : "姿态库暂不可用，请稍后重试。",
-              );
-              const available = new Set(studio.map((p) => `preset:${p.id}`));
-              setPoseIds((previous) => {
-                const valid = previous.filter((id) => available.has(id));
-                return valid.length === previous.length ? previous : valid;
-              });
-            }
-          })
-          .catch(() => {
-            if (live) setPresetError("姿态库连接失败，正在重新连接。");
-          });
-        if (!live) return;
-        setSnapshot(snap);
-        setError("");
-        if (snap)
-          setCharacters((rows) =>
-            rows.map((c) => snap.characters.find((v) => v.id === c.id) || c),
-          );
-      } catch (e) {
-        if (live) {
-          setConnected(false);
-          setError((e as Error).message);
-        }
-      } finally {
-        if (live) timer = setTimeout(load, 5000);
-      }
-    }
-    void load();
-    return () => {
-      live = false;
-      controller.abort();
-      clearTimeout(timer);
-    };
-  }, [active, revision]);
+    if (!presets.length) return;
+    const available = new Set(presets.map((preset) => `preset:${preset.id}`));
+    setPoseIds((previous) => {
+      const valid = previous.filter((id) => available.has(id));
+      return valid.length === previous.length ? previous : valid;
+    });
+  }, [presets]);
   useEffect(() => {
     if (data && !canStep(step)) setStep(character ? 1 : 0);
   }, [selection.revision, active, data, step, !!character]);
@@ -385,7 +316,7 @@ export function LiveWorkbench() {
     setNotice("");
     try {
       await action(current);
-      if (current()) setRevision((v) => v + 1);
+      if (current()) void refresh();
       return true;
     } catch (e) {
       if (current()) setNotice((e as Error).message);
@@ -479,7 +410,12 @@ export function LiveWorkbench() {
         setPending(null);
         setNotice(`已提交 ${batch.job_ids.length} 项任务。`);
       } catch (e) {
-        if (e instanceof ProductionError && e.status && e.status < 500) {
+        if (
+          e instanceof ProductionError &&
+          e.status &&
+          e.status >= 400 &&
+          e.status < 500
+        ) {
           localStorage.removeItem(intentKey(active));
           if (current()) setPending(null);
         }
@@ -757,7 +693,9 @@ export function LiveWorkbench() {
       ) : (
         <>
           <ActionLink
-            href={`/api/production/characters/${encodeURIComponent(active)}/manifest`}
+            href={apiURL(
+              `/production/characters/${encodeURIComponent(active)}/manifest`,
+            )}
             download="caster-assets.json"
           >
             下载角色清单
@@ -1065,7 +1003,7 @@ export function LiveWorkbench() {
           {data?.jobs.map((j) => (
             <div className="task" key={j.id}>
               <span>
-                {assetTypeName(j.spec.asset_type)} ·{" "}
+                {assetTypeName(j.spec.asset_type ?? undefined)} ·{" "}
                 {productionStateNames[j.state]}
               </span>
               {j.outputs
@@ -1129,7 +1067,7 @@ export function LiveWorkbench() {
       {error && (
         <div className="live-status" role="status">
           {error}
-          <button onClick={() => setRevision((v) => v + 1)}>重新连接</button>
+          <button onClick={() => void refresh()}>重新连接</button>
         </div>
       )}
       {connected && !online && (
@@ -1378,7 +1316,17 @@ export function LiveWorkbench() {
                           }
                         />
                         <img
-                          src={`/api${p.preview_url.replace(/width=\d+/, `width=${selectedImage(selection.outfit_asset_id)?.width || 1024}`).replace(/height=\d+/, `height=${selectedImage(selection.outfit_asset_id)?.height || 1536}`)}`}
+                          src={apiURL(
+                            p.preview_url
+                              .replace(
+                                /width=\d+/,
+                                `width=${selectedImage(selection.outfit_asset_id)?.width || 1024}`,
+                              )
+                              .replace(
+                                /height=\d+/,
+                                `height=${selectedImage(selection.outfit_asset_id)?.height || 1536}`,
+                              ),
+                          )}
                           loading="lazy"
                           decoding="async"
                           alt={p.name}

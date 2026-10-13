@@ -11,7 +11,8 @@ cp config.env.example config.env
 bash scripts/run.sh
 ```
 
-`config.env` 仅保存在本地。后端默认监听 `127.0.0.1:8189`，API 文档位于 `/docs`，健康检查位于 `/health`。
+`config.env` 仅保存在本地。后端默认监听 `127.0.0.1:8189`，API 文档位于 `/docs`，
+正式接口为 `/api/v1`，健康检查位于 `/api/v1/health`。旧 `/health` 和无前缀接口保留兼容。
 
 ## 前端
 
@@ -22,6 +23,15 @@ npm run dev -- --port 4173 --strictPort
 ```
 
 前端默认代理到本地后端。使用远程服务时，在本地建立 SSH 隧道，或按前端说明配置代理目标。
+
+前端可单独复制 `frontend/` 后构建，静态产物位于 `dist/client/`。同源部署的反向代理必须将
+`/api/v1/` 原样转发到后端，关闭 SSE 响应缓冲；示例见 [nginx 配置](../frontend/deploy/nginx.conf)。
+直接跨域部署时，在前端构建环境设置 `VITE_API_BASE_URL=http://127.0.0.1:8189/api/v1`，
+后端设置 `AIGC_CORS_ORIGINS=http://127.0.0.1:4173`。网址填写浏览器实际可访问的地址；
+远程回环服务通过 SSH 隧道访问。两个配置都不包含模型密钥。
+
+先升级后端以提供 `/api/v1`，再部署新前端。旧前端仍可经原代理访问兼容路径；后端回滚时，
+应同时回滚前端静态包及其代理配置。源码发布不覆盖 `AIGC_DATA_DIR`。
 
 ## ComfyUI
 

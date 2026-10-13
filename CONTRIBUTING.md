@@ -13,6 +13,11 @@ make check
 前端测试、Sites 适配测试和生产构建。这些检查无需 GPU、模型密钥或历史图片。
 CI 在 Linux 上分别验证后端与前端；前端检查不安装 Python。
 
+HTTP 接口以 `/api/v1` 为准。修改请求或工作台响应模型、共享目录后执行 `make contracts`，
+提交 `frontend/openapi.json`、`frontend/src/api/schema.d.ts` 和生成的目录副本。
+`make check-backend` 检查后端契约，`npm --prefix frontend run check:api` 检查生成类型；
+不要手动编辑这些生成文件。前端可以在仅有 `frontend/` 的源码目录中执行 `npm ci && npm run check`。
+
 日常使用 `make check-backend` 或 `make check-frontend` 检查影响范围，使用 `make format` 格式化 Python。
 生产入口仍为 `aigc.api:app`，测试通过 `create_app(config, store=..., comfy=...)` 注入依赖。
 pytest 使用临时配置与数据目录，不读取个人模型连接或运行数据库。

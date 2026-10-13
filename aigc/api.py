@@ -3,13 +3,15 @@
 import asyncio
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from .agent.engine import AgentEngine
 from .agent.router import agent_router
 from .agent.template_sync import TemplateSync
 from .comfy import Comfy
-from .config import load
+from .config import cors_origins, load
+from .http_contracts import Health
 from .production import production_router
 from .prompt_settings import prompt_settings_router
 from .rag import build_writer
@@ -105,18 +107,35 @@ def create_app(
     app.state.agent = None
     app.state.template_sync = None
 
-    @app.get("/health", tags=["System"])
+    origins = cors_origins(config)
+    if origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,
+            allow_credentials=False,
+            allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+            allow_headers=["Content-Type", "Last-Event-ID", "If-None-Match"],
+            expose_headers=["ETag", "Content-Disposition"],
+        )
+
+    routes = APIRouter()
+
+    @routes.get("/health", tags=["System"], response_model=Health)
     async def health():
         task = app.state.worker
         return {"status": "ok", "worker_alive": task is not None and not task.done()}
 
-    app.include_router(scenes_router(get_store, config))
-    app.include_router(assets_router(get_store))
-    app.include_router(jobs_router(get_store, get_comfy))
-    app.include_router(template_router(get_store))
-    app.include_router(prompt_settings_router(get_store))
-    app.include_router(production_router(get_store, get_comfy))
-    app.include_router(agent_router(get_agent, config))
+    routes.include_router(scenes_router(get_store, config))
+    routes.include_router(assets_router(get_store))
+    routes.include_router(jobs_router(get_store, get_comfy))
+    routes.include_router(template_router(get_store))
+    routes.include_router(prompt_settings_router(get_store))
+    routes.include_router(production_router(get_store, get_comfy))
+    routes.include_router(agent_router(get_agent, config))
+    app.include_router(routes, prefix="/api/v1")
+    # Existing CLI clients and deployed launchers keep working during migration.
+    # Only the versioned interface is published in the OpenAPI contract.
+    app.include_router(routes, include_in_schema=False)
     return app
 
 
