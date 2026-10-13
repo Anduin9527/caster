@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { apiURL } from "../api/http";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ServerCharacter } from "../library";
 import type { PromptSettings } from "../production";
@@ -6,6 +7,25 @@ import { workbenchKeys, workbenchQueries } from "./queries";
 
 export function useWorkbenchData(characterId: string) {
   const client = useQueryClient();
+  useEffect(() => {
+    if (!characterId) return;
+    const source = new EventSource(apiURL("/jobs/events"));
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    source.onmessage = () => {
+      if (timer) return;
+      timer = setTimeout(() => {
+        timer = undefined;
+        void client.invalidateQueries({
+          queryKey: workbenchKeys.snapshot(characterId),
+        });
+      }, 100);
+    };
+    // EventSource reconnects with Last-Event-ID; polling also covers progress.
+    return () => {
+      source.close();
+      clearTimeout(timer);
+    };
+  }, [client, characterId]);
   const charactersQuery = useQuery(workbenchQueries.characters());
   const snapshotQuery = useQuery(workbenchQueries.snapshot(characterId));
   const capabilitiesQuery = useQuery(workbenchQueries.capabilities());

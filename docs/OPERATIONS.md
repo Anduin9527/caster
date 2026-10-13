@@ -14,6 +14,16 @@ bash scripts/run.sh
 `config.env` 仅保存在本地。后端默认监听 `127.0.0.1:8189`，API 文档位于 `/docs`，
 正式接口为 `/api/v1`，健康检查位于 `/api/v1/health`。旧 `/health` 和无前缀接口保留兼容。
 
+API 不再内嵌生成 Worker；本地队列和 RabbitMQ 模式均需另起进程：
+
+```bash
+uv run --locked python -m aigc.worker_main
+```
+
+两进程使用相同配置与 `AIGC_DATA_DIR`。`scripts/service.py` 只管理 API；Worker 应由独立终端或进程管理器
+维护。升级前先停止旧版含 Worker 的 API，再启动新版 API 与独立 Worker。
+RabbitMQ 开发环境、模式约束、重试和故障核对命令见[任务执行架构](TASK_EXECUTION.md)。
+
 ## 前端
 
 ```bash

@@ -1,0 +1,23 @@
+# Development only. Bind to loopback and access through SSH tunnels.
+services:
+  rabbitmq:
+    image: rabbitmq:4.2-management@sha256:9e9fd21d60f060acc9ecbd847cd1dcb87e6550bdb0297c27e79a40bfe1766ce4
+    hostname: caster-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${AIGC_RABBITMQ_USER:?Set a local RabbitMQ username}
+      RABBITMQ_DEFAULT_PASS: ${AIGC_RABBITMQ_PASSWORD:?Set a local RabbitMQ password}
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: +S 2:2
+    ports:
+      - "127.0.0.1:${AIGC_AMQP_PORT:-5672}:5672"
+      - "127.0.0.1:${AIGC_AMQP_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    mem_limit: 1g
+    cpus: 2
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+volumes:
+  rabbitmq-data:

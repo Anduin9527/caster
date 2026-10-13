@@ -343,6 +343,9 @@ def create_batch(store, character_id, request: BatchRequest):
                 (jid, job["idempotency_key"], json.dumps(job), "queued", now, now),
             )
             jobs.append(jid)
+            from .delivery import enqueue
+
+            enqueue(db, jid)
         batch = dict(
             character_id=character_id,
             request=body,

@@ -1,6 +1,8 @@
 """Compose the CASTER application without opening resources at import time."""
 
 import asyncio
+import time
+import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import APIRouter, FastAPI
@@ -11,6 +13,7 @@ from .agent.router import agent_router
 from .agent.template_sync import TemplateSync
 from .comfy import Comfy
 from .config import cors_origins, load
+from .delivery import Delivery, request_id
 from .http_contracts import Health
 from .production import production_router
 from .prompt_settings import prompt_settings_router
@@ -20,7 +23,6 @@ from .routes.jobs import jobs_router
 from .routes.scenes import scenes_router
 from .store import Store
 from .template_api import template_router
-from .worker import Worker
 
 
 def create_app(
@@ -57,17 +59,14 @@ def create_app(
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         client = get_comfy()
-        worker = None
         tasks: list[asyncio.Task] = []
         try:
             storage = get_store()
-            worker = Worker(storage, client)
+            Delivery(storage).bind_mode(config.get("AIGC_EXECUTION_MODE", "local"))
             # Recovery runs once, before requests or background work can race it.
             app.state.recovered_agent_runs = get_agent().recover_interrupted()
             sync = TemplateSync(storage, build_writer(config))
             app.state.template_sync = sync
-            app.state.worker = asyncio.create_task(worker.run(), name="caster-worker")
-            tasks.append(app.state.worker)
             app.state.template_sync_task = asyncio.create_task(
                 sync.run(), name="caster-template-sync"
             )
@@ -82,8 +81,6 @@ def create_app(
                 for task in tasks:
                     task.cancel()
                 await asyncio.gather(*tasks, return_exceptions=True)
-                if worker is not None:
-                    worker.close()
                 try:
                     sync = app.state.template_sync
                     if sync is not None and sync.writer is not None:
@@ -107,6 +104,18 @@ def create_app(
     app.state.agent = None
     app.state.template_sync = None
 
+    @app.middleware("http")
+    async def trace_request(request, call_next):
+        # Server-generated identifiers cannot inject attacker text into logs.
+        trace = uuid.uuid4().hex
+        token = request_id.set(trace)
+        try:
+            response = await call_next(request)
+            response.headers["X-Request-ID"] = trace
+            return response
+        finally:
+            request_id.reset(token)
+
     origins = cors_origins(config)
     if origins:
         app.add_middleware(
@@ -115,15 +124,30 @@ def create_app(
             allow_credentials=False,
             allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
             allow_headers=["Content-Type", "Last-Event-ID", "If-None-Match"],
-            expose_headers=["ETag", "Content-Disposition"],
+            expose_headers=["ETag", "Content-Disposition", "X-Request-ID"],
         )
 
     routes = APIRouter()
 
     @routes.get("/health", tags=["System"], response_model=Health)
     async def health():
-        task = app.state.worker
-        return {"status": "ok", "worker_alive": task is not None and not task.done()}
+        storage = app.state.store
+        beat = (storage.get("runtime", "worker") or {}) if storage else {}
+        broker = (storage.get("runtime", "broker") or {}) if storage else {}
+        mode = config.get("AIGC_EXECUTION_MODE", "local")
+        return {
+            "status": "ok",
+            "worker_alive": time.time() - beat.get("at", 0) < 15,
+            "execution_mode": mode,
+            "broker_connected": bool(
+                broker.get("connected") and time.time() - broker.get("at", 0) < 15
+            )
+            if mode == "rabbitmq"
+            else None,
+            "outbox_pending": Delivery(storage).pending_count()
+            if storage and mode == "rabbitmq"
+            else 0,
+        }
 
     routes.include_router(scenes_router(get_store, config))
     routes.include_router(assets_router(get_store))

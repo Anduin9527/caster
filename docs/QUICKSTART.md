@@ -18,7 +18,14 @@ INFO:     Application startup complete.
 INFO:     Uvicorn running on http://127.0.0.1:8189
 ```
 
-验证：访问 <http://127.0.0.1:8189/health>，正常启动后返回 `{"status":"ok","worker_alive":true}`。
+验证：访问 <http://127.0.0.1:8189/health>，正常启动后 `status` 为 `ok`；仅启动 API 时 `worker_alive` 为 `false`。
+执行生成任务时另开终端，使用相同数据目录运行：
+
+```bash
+AIGC_DATA_DIR="$PWD/data/local-dev" uv run --locked python -m aigc.worker_main
+```
+
+RabbitMQ 模式与恢复规则见[任务执行架构](TASK_EXECUTION.md)。
 
 ### 2. 前端工作台
 

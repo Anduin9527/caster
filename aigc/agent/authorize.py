@@ -249,6 +249,9 @@ def approve(
                 (job_id, body["idempotency_key"], json.dumps(body), "queued", now, now),
             )
             job_ids.append(job_id)
+            from ..delivery import enqueue
+
+            enqueue(db, job_id)
         authorization = {
             "authorization_id": auth_id,
             "plan_id": plan_id,

@@ -59,7 +59,18 @@ def test_worker_outfit_inherits_actual_source_over_scene_canvas(tmp_path, monkey
         "miku",
     )
     Image.new("RGB", (768, 1152)).save(tmp_path / "files/ref.png")
-    store.put("asset", dict(path="ref.png", width=768, height=1152), "ref")
+    import hashlib
+
+    store.put(
+        "asset",
+        dict(
+            path="ref.png",
+            width=768,
+            height=1152,
+            sha256=hashlib.sha256((tmp_path / "files/ref.png").read_bytes()).hexdigest(),
+        ),
+        "ref",
+    )
     store.put(
         "scene_spec",
         {

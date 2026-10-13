@@ -92,6 +92,19 @@ def production_router(get_store, get_comfy=None):
                 store.decode(r)
                 for r in db.execute("SELECT * FROM jobs ORDER BY created DESC").fetchall()
             ]
+            deliveries = {r["job_id"]: dict(r) for r in db.execute("SELECT * FROM job_delivery")}
+            for job in jobs:
+                d = deliveries.get(job["id"])
+                if d:
+                    job["delivery"] = {
+                        "generation": d["generation"],
+                        "attempts": d["attempts"],
+                        "received": bool(d["received"]),
+                        "request_id": d["request_id"],
+                        "retryable": bool(
+                            d["retryable"] and job["state"] == "failed" and not job["prompt_id"]
+                        ),
+                    }
 
         def spec_for(spec_id):
             return specs.get(spec_id, {}).get("spec", {})

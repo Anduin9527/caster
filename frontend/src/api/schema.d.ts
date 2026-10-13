@@ -549,6 +549,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/jobs/{id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retry */
+        post: operations["retry_api_v1_jobs__id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/jobs/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Events */
+        get: operations["events_api_v1_jobs_events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/poses": {
         parameters: {
             query?: never;
@@ -1110,8 +1144,34 @@ export interface components {
              */
             title?: string;
         };
+        /** DeliveryInfo */
+        DeliveryInfo: {
+            /** Attempts */
+            attempts: number;
+            /** Generation */
+            generation: number;
+            /** Received */
+            received: boolean;
+            /** Request Id */
+            request_id: string;
+            /** Retryable */
+            retryable: boolean;
+        };
         /** Health */
         Health: {
+            /** Broker Connected */
+            broker_connected?: boolean | null;
+            /**
+             * Execution Mode
+             * @default local
+             * @enum {string}
+             */
+            execution_mode?: "local" | "rabbitmq";
+            /**
+             * Outbox Pending
+             * @default 0
+             */
+            outbox_pending?: number;
             /**
              * Status
              * @constant
@@ -1145,6 +1205,27 @@ export interface components {
             type?: string | null;
             /** Value */
             value?: number | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** JobRecord */
+        JobRecord: {
+            body: components["schemas"]["JobBody"];
+            /** Created */
+            created: number;
+            delivery?: components["schemas"]["DeliveryInfo"] | null;
+            /** Error */
+            error?: string | null;
+            /** Id */
+            id: string;
+            /** Outputs */
+            outputs: string[];
+            progress?: components["schemas"]["JobProgress"] | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "queued" | "submitting" | "running" | "recovering" | "submission_uncertain" | "succeeded" | "failed" | "needs_correction" | "cancelled";
         } & {
             [key: string]: unknown;
         };
@@ -1308,6 +1389,7 @@ export interface components {
             body: components["schemas"]["JobBody"];
             /** Created */
             created: number;
+            delivery?: components["schemas"]["DeliveryInfo"] | null;
             /** Error */
             error?: string | null;
             /** Id */
@@ -1497,6 +1579,11 @@ export interface components {
              * @default
              */
             trigger?: string;
+        };
+        /** RetryRequest */
+        RetryRequest: {
+            /** Generation */
+            generation: number;
         };
         /** ReviewRecord */
         ReviewRecord: {
@@ -2701,7 +2788,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["JobRecord"][];
                 };
             };
         };
@@ -2756,7 +2843,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["JobRecord"];
                 };
             };
             /** @description Validation Error */
@@ -2808,6 +2895,72 @@ export interface operations {
             path: {
                 id: string;
             };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retry_api_v1_jobs__id__retry_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RetryRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobRecord"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    events_api_v1_jobs_events_get: {
+        parameters: {
+            query?: {
+                after?: string;
+            };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;

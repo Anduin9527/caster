@@ -5,6 +5,10 @@ import httpx
 import websockets
 
 
+class SubmissionRejected(ValueError):
+    """ComfyUI explicitly rejected the graph before enqueueing it."""
+
+
 class Comfy:
     def __init__(self, url):
         self.url = url.rstrip("/")
@@ -50,7 +54,7 @@ class Comfy:
             },
         )
         if r.status_code == 400:
-            raise ValueError("Workflow validation failed: " + r.text[:4000])
+            raise SubmissionRejected("Workflow validation failed: " + r.text[:4000])
         r.raise_for_status()
         return r.json()["prompt_id"]
 

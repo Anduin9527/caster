@@ -32,7 +32,8 @@ FastAPI + SQLite 保存模板、角色、资产、计划和任务，ComfyUI 只�
 
 `aigc.api.create_app()` 组装应用；保留 `aigc.api:app` 部署入口。应用导入或生成 OpenAPI 时不创建数据库、
 HTTP 客户端或 worker。每个应用实例使用自己的配置、Store、AgentEngine 和 ComfyUI 客户端，生命周期
-负责恢复中断轮次、启动任务，并在正常关闭及启动失败时结束 Agent 任务、释放客户端与 worker 锁。
+负责恢复 Agent 中断轮次、同步模板，并在关闭时结束 Agent 任务、释放客户端。生成 Worker 使用独立进程，
+API 不获取执行锁，也不执行已入队的生成任务。事务 outbox、RabbitMQ 与恢复协议见[任务执行架构](TASK_EXECUTION.md)。
 
 | 模块 | 职责 |
 | --- | --- |
@@ -43,6 +44,10 @@ HTTP 客户端或 worker。每个应用实例使用自己的配置、Store、Age
 | `aigc/agent/events.py` | SQLite 有序事件追加、游标分页与重连恢复 |
 | `aigc/workbench.py`、`aigc/production.py` | 当前选图、不可变版本、制作批次与快照 |
 | `aigc/worker.py` | 串行执行、授权复核、ComfyUI history 恢复、输出验证 |
+| `aigc/worker_main.py` | 独立执行进程、GPU 锁、心跳与退出回收 |
+| `aigc/delivery.py` | 事务 outbox、持久化接收、提交 CAS、安全重试与状态事件 |
+| `aigc/broker.py` | RabbitMQ 发布确认、消息接收与手动 ACK、死信拓扑 |
+| `aigc/job_snapshot.py` | 工作台与兼容入队接口的冻结输入快照 |
 | `aigc/store.py` | SQLite 事务与持久化；事务结束时关闭连接 |
 | `aigc/rag*.py` | 查询、编码器、索引指纹与 Wiki 正文目录 |
 | `frontend/src/agent/` | 会话请求与事件流生命周期、连接设置、证据、工具轨迹与审批卡 |

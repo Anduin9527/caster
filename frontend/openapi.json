@@ -501,6 +501,39 @@
         "title": "ConversationBody",
         "type": "object"
       },
+      "DeliveryInfo": {
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "generation": {
+            "title": "Generation",
+            "type": "integer"
+          },
+          "received": {
+            "title": "Received",
+            "type": "boolean"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "generation",
+          "attempts",
+          "received",
+          "retryable",
+          "request_id"
+        ],
+        "title": "DeliveryInfo",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -516,6 +549,31 @@
       },
       "Health": {
         "properties": {
+          "broker_connected": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Broker Connected"
+          },
+          "execution_mode": {
+            "default": "local",
+            "enum": [
+              "local",
+              "rabbitmq"
+            ],
+            "title": "Execution Mode",
+            "type": "string"
+          },
+          "outbox_pending": {
+            "default": 0,
+            "title": "Outbox Pending",
+            "type": "integer"
+          },
           "status": {
             "const": "ok",
             "title": "Status",
@@ -617,6 +675,84 @@
           }
         },
         "title": "JobProgress",
+        "type": "object"
+      },
+      "JobRecord": {
+        "additionalProperties": true,
+        "properties": {
+          "body": {
+            "$ref": "#/components/schemas/JobBody"
+          },
+          "created": {
+            "title": "Created",
+            "type": "number"
+          },
+          "delivery": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeliveryInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "outputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Outputs",
+            "type": "array"
+          },
+          "progress": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobProgress"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "enum": [
+              "queued",
+              "submitting",
+              "running",
+              "recovering",
+              "submission_uncertain",
+              "succeeded",
+              "failed",
+              "needs_correction",
+              "cancelled"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "state",
+          "outputs",
+          "created",
+          "body"
+        ],
+        "title": "JobRecord",
         "type": "object"
       },
       "JobRequest": {
@@ -1088,6 +1224,16 @@
             "title": "Created",
             "type": "number"
           },
+          "delivery": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeliveryInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "error": {
             "anyOf": [
               {
@@ -1142,10 +1288,10 @@
         "required": [
           "id",
           "state",
-          "spec",
           "outputs",
           "created",
-          "body"
+          "body",
+          "spec"
         ],
         "title": "ProductionJob",
         "type": "object"
@@ -1599,6 +1745,21 @@
           "name"
         ],
         "title": "PromptTemplate",
+        "type": "object"
+      },
+      "RetryRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "generation": {
+            "minimum": 0.0,
+            "title": "Generation",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "generation"
+        ],
+        "title": "RetryRequest",
         "type": "object"
       },
       "ReviewRecord": {
@@ -3354,7 +3515,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/JobRecord"
+                  },
+                  "title": "Response Jobs Api V1 Jobs Get",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -3403,6 +3570,47 @@
         ]
       }
     },
+    "/api/v1/jobs/events": {
+      "get": {
+        "operationId": "events_api_v1_jobs_events_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "After",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Events",
+        "tags": [
+          "Jobs"
+        ]
+      }
+    },
     "/api/v1/jobs/{id}": {
       "get": {
         "operationId": "job_api_v1_jobs__id__get",
@@ -3421,7 +3629,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/JobRecord"
+                }
               }
             },
             "description": "Successful Response"
@@ -3518,6 +3728,58 @@
           }
         },
         "summary": "Generation Record",
+        "tags": [
+          "Jobs"
+        ]
+      }
+    },
+    "/api/v1/jobs/{id}/retry": {
+      "post": {
+        "operationId": "retry_api_v1_jobs__id__retry_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Retry",
         "tags": [
           "Jobs"
         ]

@@ -1,4 +1,5 @@
 import json
+import logging
 import sqlite3
 import time
 import uuid
@@ -31,6 +32,9 @@ class Store:
             ) WHERE kind='agent_event';
             CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY,idempotency_key TEXT UNIQUE NOT NULL,body TEXT NOT NULL,state TEXT NOT NULL,created REAL NOT NULL,updated REAL NOT NULL,prompt_id TEXT,error TEXT,progress TEXT,outputs TEXT NOT NULL DEFAULT '[]');
             """)
+            from .delivery import initialize
+
+            initialize(c)
 
     def connect(self):
         c = sqlite3.connect(self.path, timeout=30, factory=_Connection)
@@ -74,6 +78,9 @@ class Store:
                 "INSERT INTO jobs(id,idempotency_key,body,state,created,updated) VALUES(?,?,?,?,?,?)",
                 (id, body["idempotency_key"], json.dumps(body), "queued", t, t),
             )
+            from .delivery import enqueue
+
+            enqueue(c, id)
         return self.job(id)
 
     @staticmethod
@@ -111,6 +118,15 @@ class Store:
             c.execute(
                 "UPDATE jobs SET " + ",".join(k + "=?" for k in changes) + " WHERE id=?",
                 [*changes.values(), id],
+            )
+        if "state" in changes:
+            from .delivery import Delivery
+
+            logging.getLogger(__name__).info(
+                "job_state request_id=%s job_id=%s state=%s",
+                Delivery(self).info(id).get("request_id", ""),
+                id,
+                changes["state"],
             )
 
     def append_outfit(self, character_id, outfit, name="", parent_id=None):

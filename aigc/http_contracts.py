@@ -18,6 +18,9 @@ class ReadModel(BaseModel):
 class Health(BaseModel):
     status: Literal["ok"]
     worker_alive: bool
+    execution_mode: Literal["local", "rabbitmq"] = "local"
+    broker_connected: bool | None = None
+    outbox_pending: int = 0
 
 
 class Capabilities(BaseModel):
@@ -78,7 +81,15 @@ class JobBody(ReadModel):
     reference_asset_id: str | None = None
 
 
-class ProductionJob(ReadModel):
+class DeliveryInfo(BaseModel):
+    generation: int
+    attempts: int
+    received: bool
+    retryable: bool
+    request_id: str
+
+
+class JobRecord(ReadModel):
     id: str
     state: Literal[
         "queued",
@@ -91,12 +102,16 @@ class ProductionJob(ReadModel):
         "needs_correction",
         "cancelled",
     ]
-    spec: ProductionSpec
     outputs: list[str]
     error: str | None = None
     created: float
     progress: JobProgress | None = None
     body: JobBody
+    delivery: DeliveryInfo | None = None
+
+
+class ProductionJob(JobRecord):
+    spec: ProductionSpec
 
 
 class ProductionSelection(ReadModel):

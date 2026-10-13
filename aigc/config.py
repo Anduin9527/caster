@@ -54,6 +54,10 @@ def load(path=None):
         "AIGC_COMFY_URL": "http://127.0.0.1:8188",
         "AIGC_UI_URL": "http://127.0.0.1:4173",
         "AIGC_CORS_ORIGINS": "",
+        "AIGC_EXECUTION_MODE": "local",
+        "AIGC_GPU_LOCK": "/tmp/caster-gpu-0.lock",
+        "AIGC_RABBITMQ_URL": "amqp://guest:guest@127.0.0.1:5672/",
+        "AIGC_RABBITMQ_QUEUE": "caster.gpu0",
         "AIGC_DATA_DIR": str(ROOT / "data"),
         # Semantic (vector) retrieval. Empty AIGC_RAG_DIR means the index is not
         # deployed and retrieval reports semantic search as unavailable instead

@@ -143,6 +143,13 @@ export function createProductionAPI(fetcher: typeof fetch = fetch) {
         return Promise.reject(new ProductionError("只能取消排队中的任务。"));
       return write(`/jobs/${encodeURIComponent(job.id)}/cancel`, {});
     },
+    retryJob(job: ProductionJob): Promise<Models["JobRecord"]> {
+      if (job.state !== "failed" || !job.delivery?.retryable)
+        return Promise.reject(new ProductionError("此任务不能安全重试。"));
+      return write(`/jobs/${encodeURIComponent(job.id)}/retry`, {
+        generation: job.delivery.generation,
+      });
+    },
     async snapshot(
       characterId: string,
       signal?: AbortSignal,

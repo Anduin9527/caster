@@ -7,25 +7,40 @@ import time
 import uuid
 
 from .assets import asset_path, save_image
+from .comfy import SubmissionRejected
+from .delivery import Delivery
 from .prompts import compile_prompt
 from .schema import SceneSpec
 from .workflows import build, validate_models
 
 
 class Worker:
-    def __init__(self, store, comfy):
+    def __init__(self, store, comfy, *, mode="local", gpu_lock=None):
         self.store = store
         self.comfy = comfy
+        self.mode = mode
+        self.delivery = Delivery(store)
+        self.gpu_lock = None
         self.lock = (store.root / "worker.lock").open("a")
         try:
             fcntl.flock(self.lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            if gpu_lock:
+                from pathlib import Path
+
+                self.gpu_lock = Path(gpu_lock).open("a")
+                fcntl.flock(self.gpu_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            self.delivery.bind_mode(mode)
         except BaseException:
             self.lock.close()
+            if self.gpu_lock:
+                self.gpu_lock.close()
             raise
 
     def close(self):
         """Release ownership even if startup failed before run() was scheduled."""
         self.lock.close()
+        if self.gpu_lock:
+            self.gpu_lock.close()
 
     async def run(self):
         listener = None
@@ -33,6 +48,9 @@ class Worker:
         try:
             while True:
                 try:
+                    self.store.put(
+                        "runtime", {"at": time.time(), "mode": self.mode}, "worker", replace=True
+                    )
                     active = self.store.jobs(
                         ["submitting", "running", "recovering", "submission_uncertain"]
                     )
@@ -56,7 +74,11 @@ class Worker:
                             listener.cancel()
                             listener = None
                             listening_id = None
-                        waiting = self.store.jobs(["queued"])
+                        waiting = [
+                            j
+                            for j in self.store.jobs(["queued"])
+                            if self.delivery.eligible(j["id"], self.mode)
+                        ]
                         if waiting:
                             q = await self.comfy.queue()
                             if not q.get("queue_running") and not q.get("queue_pending"):
@@ -95,6 +117,15 @@ class Worker:
             raise ValueError("授权快照缺少提示词，拒绝执行")
         if auth.get("source_asset_id") != body.get("reference_asset_id"):
             raise ValueError("授权记录与任务的来源图不一致，拒绝执行")
+        if body.get("reference_asset_id"):
+            source = self.store.get("asset", body["reference_asset_id"])
+            if (
+                not source
+                or source.get("sha256") != auth.get("source_sha256")
+                or hashlib.sha256(asset_path(self.store, source).read_bytes()).hexdigest()
+                != auth.get("source_sha256")
+            ):
+                raise ValueError("来源图与批准的内容不一致，拒绝执行")
         if auth.get("workflow") != body.get("agent_workflow"):
             raise ValueError("授权记录与任务的工作流不一致，拒绝执行")
         if auth.get("workflow_version") != body.get("agent_workflow_version"):
@@ -120,13 +151,28 @@ class Worker:
 
     async def execute(self, job):
         id = job["id"]
+        if self.store.job(id)["state"] != "queued" or not self.delivery.eligible(id, self.mode):
+            return
         body = job["body"]
         try:
+            snapshot = self.store.get("job_snapshot", id)
             spec_record = self.store.get("scene_spec", body["scene_spec_id"])
-            spec = SceneSpec.model_validate(spec_record["spec"])
+            spec = SceneSpec.model_validate(snapshot["spec"] if snapshot else spec_record["spec"])
             character = (
                 self.store.get("character", spec.character_id) if spec.character_id else None
             )
+            if snapshot:
+                character = snapshot["character"]
+                for key, frozen_source in snapshot["sources"].items():
+                    source = self.store.get("asset", body[key])
+                    if (
+                        not source
+                        or not frozen_source
+                        or source.get("sha256") != frozen_source.get("sha256")
+                        or hashlib.sha256(asset_path(self.store, source).read_bytes()).hexdigest()
+                        != frozen_source.get("sha256")
+                    ):
+                        raise ValueError("Input asset changed after confirmation")
             frozen = body.get("agent_plan_id")
             graph_template = None
             binding_template = None
@@ -138,7 +184,13 @@ class Worker:
             else:
                 from .prompt_settings import get_prompt_settings
 
-                prompt = compile_prompt(spec, character, get_prompt_settings(self.store))
+                prompt = compile_prompt(
+                    spec,
+                    character,
+                    snapshot["settings"] if snapshot else get_prompt_settings(self.store),
+                )
+                if snapshot:
+                    graph_template, binding_template = snapshot["graph"], snapshot["bindings"]
             kind = body.get("agent_workflow") if frozen else spec.asset_type
             inputs = {}
             from .canvas import preset_size, source_size
@@ -151,7 +203,9 @@ class Worker:
                 if spec.asset_type in ("outfit", "pose"):
                     inputs["width"], inputs["height"] = source_size(asset)
             if body.get("pose_asset_id"):
-                pose = self.store.get("pose", body["pose_asset_id"])
+                pose = (
+                    snapshot["pose"] if snapshot else self.store.get("pose", body["pose_asset_id"])
+                )
                 if pose.get("preset_id", 0) >= 101:
                     from .pose_studio_presets import materialize
 
@@ -217,12 +271,11 @@ class Worker:
                 replace=True,
             )
             # Persist intent before network I/O. On uncertainty NEVER auto-resubmit.
-            if self.store.job(id)["state"] != "queued":
+            if not self.delivery.begin_submission(id, self.mode):
                 return
-            self.store.update_job(id, state="submitting")
             try:
                 pid = await self.comfy.submit(graph, id)
-            except ValueError:
+            except SubmissionRejected:
                 raise
             except Exception:
                 self.store.update_job(
@@ -233,11 +286,27 @@ class Worker:
                 return
             self.store.update_job(id, state="running", prompt_id=pid, error=None)
         except Exception as e:
-            self.store.update_job(id, state="failed", error=str(e)[:4000])
+            import httpx
+
+            if self.store.job(id)["state"] == "queued":
+                self.delivery.fail_before_submit(
+                    id,
+                    str(e)[:4000],
+                    transient=isinstance(e, (httpx.TransportError, ConnectionError, OSError)),
+                )
+            elif self.store.job(id)["state"] == "submitting":
+                # A database error after a successful POST is also uncertain.
+                # Only an explicit rejection proves there is no remote task.
+                self.store.update_job(
+                    id,
+                    state="failed" if isinstance(e, SubmissionRejected) else "submission_uncertain",
+                    error=str(e)[:4000],
+                )
 
     async def reconcile(self, job):
         id = job["id"]
         pid = job["prompt_id"]
+        remote_completed = False
         try:
             if not pid:
                 pid = await self.comfy.locate(id)
@@ -270,6 +339,7 @@ class Worker:
                 return
             if not st.get("completed"):
                 return
+            remote_completed = True
             execution = self.store.get("execution", id)
             if not execution:
                 raise ValueError("Missing persisted execution metadata")
@@ -356,7 +426,7 @@ class Worker:
         except Exception as e:
             import httpx
 
-            if isinstance(e, httpx.HTTPError):
+            if isinstance(e, httpx.HTTPError) or not remote_completed:
                 self.store.update_job(
                     id,
                     state="recovering",

@@ -1006,6 +1006,25 @@ export function LiveWorkbench() {
                 {assetTypeName(j.spec.asset_type ?? undefined)} ·{" "}
                 {productionStateNames[j.state]}
               </span>
+              {j.error && <p className="error">{jobErrorLabel(j.error)}</p>}
+              {j.error && (
+                <details>
+                  <summary>查看原因</summary>
+                  <p>{j.error}</p>
+                </details>
+              )}
+              {j.state === "failed" && j.delivery?.retryable && (
+                <button
+                  disabled={busy}
+                  onClick={() =>
+                    act(async () => {
+                      await productionAPI.retryJob(j);
+                    })
+                  }
+                >
+                  重试
+                </button>
+              )}
               {j.outputs
                 .filter(
                   (id) => assets.find((a) => a.id === id)?.role === "original",

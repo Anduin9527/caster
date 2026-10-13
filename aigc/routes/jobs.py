@@ -1,13 +1,22 @@
 """Jobs endpoints with per-application dependencies."""
 
+import time
 from collections.abc import Callable
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import StreamingResponse
+from pydantic import Field
 
 from ..comfy import Comfy
-from ..schema import JobRequest
+from ..delivery import Delivery
+from ..http_contracts import JobRecord
+from ..schema import JobRequest, Strict
 from ..store import Store
 from .common import required
+
+
+class RetryRequest(Strict):
+    generation: int = Field(ge=0)
 
 
 def jobs_router(get_store: Callable[[], Store], get_comfy: Callable[[], Comfy]) -> APIRouter:
@@ -58,12 +67,28 @@ def jobs_router(get_store: Callable[[], Store], get_comfy: Callable[[], Comfy]) 
         except ValueError as e:
             raise HTTPException(409, str(e))
 
-    @router.get("/jobs")
+    @router.get("/jobs", response_model=list[JobRecord], response_model_exclude_unset=True)
     async def jobs():
         store = get_store()
-        return store.jobs()
+        return [dict(j, delivery=Delivery(store).info(j["id"])) for j in store.jobs()]
 
-    @router.get("/jobs/{id}")
+    @router.get("/jobs/events")
+    async def events(request: Request, after: str = ""):
+        from ..agent.router import sse_frames
+
+        cursor = request.headers.get("Last-Event-ID") or after
+        ledger = Delivery(get_store())
+        try:
+            ledger.events_since("jobs", cursor)
+        except LookupError as error:
+            raise HTTPException(400, str(error))
+        return StreamingResponse(
+            sse_frames(ledger.events_since, "jobs", cursor, request.is_disconnected),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
+
+    @router.get("/jobs/{id}", response_model=JobRecord, response_model_exclude_unset=True)
     async def job(id: str):
         store = get_store()
         j = store.job(id)
@@ -71,6 +96,7 @@ def jobs_router(get_store: Callable[[], Store], get_comfy: Callable[[], Comfy]) 
             raise HTTPException(404, "Unknown job")
         return dict(
             j,
+            delivery=Delivery(store).info(id),
             output_assets=[
                 dict(required(store, "asset", a), download_url="/assets/" + a + "/file")
                 for a in j["outputs"]
@@ -82,8 +108,14 @@ def jobs_router(get_store: Callable[[], Store], get_comfy: Callable[[], Comfy]) 
         store = get_store()
         j = await job(id)
         if j["state"] == "queued":
-            store.update_job(id, state="cancelled")
-            return store.job(id)
+            with store.connect() as db:
+                changed = db.execute(
+                    "UPDATE jobs SET state='cancelled',updated=? WHERE id=? AND state='queued'",
+                    (time.time(), id),
+                ).rowcount
+            if changed:
+                return store.job(id)
+            raise HTTPException(409, "Task already started; refresh before cancelling")
         if j["state"] in ("running", "recovering") and j["prompt_id"]:
             if await get_comfy().cancel_pending(j["prompt_id"]):
                 store.update_job(id, state="cancelled")
@@ -91,6 +123,17 @@ def jobs_router(get_store: Callable[[], Store], get_comfy: Callable[[], Comfy]) 
         raise HTTPException(
             409, "Job not safely cancellable. Running inference is not globally interrupted."
         )
+
+    @router.post("/jobs/{id}/retry", response_model=JobRecord, response_model_exclude_unset=True)
+    async def retry(id: str, body: RetryRequest):
+        store = get_store()
+        try:
+            Delivery(store).retry(id, body.generation)
+        except LookupError as error:
+            raise HTTPException(404, str(error))
+        except ValueError as error:
+            raise HTTPException(409, str(error))
+        return await job(id)
 
     @router.get("/approvals")
     async def approvals():

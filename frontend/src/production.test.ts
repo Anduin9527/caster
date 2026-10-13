@@ -156,3 +156,41 @@ test("prompt preferences use a dedicated read/write settings endpoint", async ()
     },
   ]);
 });
+
+test("job retry requires a safe failed state and sends the delivery generation", async () => {
+  const calls: { url: string; body: unknown }[] = [];
+  const api = createProductionAPI((async (url, init) => {
+    calls.push({ url: String(url), body: JSON.parse(String(init?.body)) });
+    return Response.json({ id: "job", state: "queued" });
+  }) as typeof fetch);
+  for (const state of [
+    "running",
+    "queued",
+    "submission_uncertain",
+    "succeeded",
+  ]) {
+    await assert.rejects(
+      api.retryJob({
+        id: "job",
+        state,
+        delivery: { retryable: true, generation: 2 },
+      } as ProductionJob),
+    );
+  }
+  await assert.rejects(
+    api.retryJob({
+      id: "job",
+      state: "failed",
+      delivery: { retryable: false },
+    } as ProductionJob),
+  );
+  assert.equal(calls.length, 0);
+  await api.retryJob({
+    id: "job",
+    state: "failed",
+    delivery: { retryable: true, generation: 2 },
+  } as ProductionJob);
+  assert.deepEqual(calls, [
+    { url: "/api/v1/jobs/job/retry", body: { generation: 2 } },
+  ]);
+});

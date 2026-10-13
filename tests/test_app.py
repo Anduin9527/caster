@@ -74,9 +74,12 @@ def test_lifespan_recovers_runs_and_closes_background_resources(tmp_path):
     comfy = OfflineComfy()
     app = api.create_app(store=store, comfy=comfy)
     with TestClient(app) as client:
-        assert client.get("/health").json()["worker_alive"] is True
+        assert client.get("/health").json()["worker_alive"] is False
+        assert app.state.worker is None
+        # The API must not own the execution lock; an independent worker can start.
+        Worker(store, OfflineComfy()).close()
         assert conversations.get_run("interrupted-run")["status"] == "interrupted"
-        tasks = [app.state.worker, app.state.template_sync_task]
+        tasks = [app.state.template_sync_task]
     assert all(task.done() for task in tasks)
     assert comfy.closed is True
     assert app.state.comfy is None

@@ -1,4 +1,4 @@
-.PHONY: setup check check-backend check-frontend check-contracts contracts lint test format api ui
+.PHONY: setup check check-backend check-frontend check-contracts contracts lint test format api worker ui
 
 setup:
 	uv sync --locked --group dev
@@ -31,6 +31,9 @@ format:
 
 api:
 	bash scripts/run.sh
+
+worker:
+	uv run --locked python -m aigc.worker_main
 
 ui:
 	npm --prefix frontend run dev

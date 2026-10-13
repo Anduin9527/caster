@@ -68,7 +68,7 @@ elif cmd == "start":
         for _ in range(100):
             try:
                 d = json.load(urllib.request.urlopen(API_URL + "/health", timeout=1))
-                if d["worker_alive"] and owned():
+                if d.get("status") == "ok" and owned():
                     break
             except Exception:
                 pass
